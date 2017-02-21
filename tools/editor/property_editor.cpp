@@ -4538,7 +4538,7 @@ PropertyEditor::PropertyEditor() {
 	tree->connect("button_pressed", this,"_edit_button");
 	custom_editor->connect("variant_changed", this,"_custom_editor_edited");
 	custom_editor->connect("resource_edit_request", this,"_resource_edit_request",make_binds(),CONNECT_DEFERRED);
-	tree->set_hide_folding(true);
+	tree->set_hide_folding(false);
 
 	evaluator = memnew (PropertyValueEvaluator);
 	tree->set_value_evaluator(evaluator);
@@ -4547,7 +4547,7 @@ PropertyEditor::PropertyEditor() {
 	capitalize_paths=true;
 	autoclear=false;
 	tree->set_column_titles_visible(false);
-
+    
 	keying=false;
 	read_only=false;
 	show_categories=false;

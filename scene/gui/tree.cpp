@@ -343,6 +343,17 @@ bool TreeItem::is_collapsed() {
 	return collapsed;
 }
 
+void TreeItem::set_collapsable(bool p_collapsable){
+    
+    collapsable = p_collapsable;
+    if (collapsed && !p_collapsable){
+        set_collapsed(false);
+    }
+}
+bool TreeItem::is_collapsable() {
+    
+    return collapsable;
+}
 
 TreeItem *TreeItem::get_next() {
 
@@ -756,6 +767,7 @@ TreeItem::TreeItem(Tree *p_tree) {
 
 	tree=p_tree;
 	collapsed=false;
+    collapsable=true;
 
 	parent=0; // parent item
 	next=0; // next in list

@@ -59,7 +59,7 @@ public:
 	};
 
 private:
-friend class Tree;
+    friend class Tree;
 
 
 	struct Cell {
@@ -126,7 +126,8 @@ friend class Tree;
 	Vector<Cell> cells;
 
 	bool collapsed; // wont show childs
-
+    bool collapsable;
+    
 	TreeItem *parent; // parent item
 	TreeItem *next; // next in list
 	TreeItem *childs; //child items
@@ -209,6 +210,9 @@ public:
 	void set_collapsed(bool p_collapsed);
 	bool is_collapsed();
 
+    void set_collapsable(bool p_collapsable);
+    bool is_collapsable();
+    
 	TreeItem *get_prev();
 	TreeItem *get_next();
 	TreeItem *get_parent();
