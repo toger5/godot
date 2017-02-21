@@ -829,7 +829,21 @@ static int translateKey(unsigned int key)
     const int mods = translateFlags([event modifierFlags]);
     _glfwInputKey(window, key, [event keyCode], GLFW_RELEASE, mods);*/
 }
-
+inline void sendScrollEvent(int button, double factor){
+    InputEvent ev;
+    ev.type=InputEvent::MOUSE_BUTTON;
+    ev.mouse_button.button_index=button;
+    ev.mouse_button.factor=factor;
+    ev.mouse_button.pressed=true;
+    ev.mouse_button.x=mouse_x;
+    ev.mouse_button.y=mouse_y;
+    ev.mouse_button.global_x=mouse_x;
+    ev.mouse_button.global_y=mouse_y;
+    ev.mouse_button.button_mask=button_mask;
+    OS_OSX::singleton->push_input(ev);
+    ev.mouse_button.pressed=false;
+    OS_OSX::singleton->push_input(ev);
+}
 - (void)scrollWheel:(NSEvent *)event
 {
 
@@ -843,8 +857,8 @@ static int translateKey(unsigned int key)
 
 	if ([event hasPreciseScrollingDeltas])
 	{
-	    deltaX *= 0.1;
-	    deltaY *= 0.1;
+	    deltaX *= 0.03;
+	    deltaY *= 0.03;
 	}
     }
     else
@@ -854,37 +868,12 @@ static int translateKey(unsigned int key)
 	deltaY = [event deltaY];
     }
 
-
+    int button;
+    if (fabs(deltaX)){
+        sendScrollEvent(0 > deltaX ? BUTTON_WHEEL_RIGHT : BUTTON_WHEEL_LEFT, fabs(deltaX * 0.3));
+    }
 	if (fabs(deltaY)) {
-
-		InputEvent ev;
-		ev.type=InputEvent::MOUSE_BUTTON;
-		ev.mouse_button.button_index=deltaY >0 ? BUTTON_WHEEL_UP : BUTTON_WHEEL_DOWN;
-		ev.mouse_button.pressed=true;
-		ev.mouse_button.x=mouse_x;
-		ev.mouse_button.y=mouse_y;
-		ev.mouse_button.global_x=mouse_x;
-		ev.mouse_button.global_y=mouse_y;
-		ev.mouse_button.button_mask=button_mask;
-		OS_OSX::singleton->push_input(ev);
-		ev.mouse_button.pressed=false;
-		OS_OSX::singleton->push_input(ev);
-	}
-
-	if (fabs(deltaX)) {
-
-		InputEvent ev;
-		ev.type=InputEvent::MOUSE_BUTTON;
-		ev.mouse_button.button_index=deltaX < 0 ? BUTTON_WHEEL_RIGHT : BUTTON_WHEEL_LEFT;
-		ev.mouse_button.pressed=true;
-		ev.mouse_button.x=mouse_x;
-		ev.mouse_button.y=mouse_y;
-		ev.mouse_button.global_x=mouse_x;
-		ev.mouse_button.global_y=mouse_y;
-		ev.mouse_button.button_mask=button_mask;
-		OS_OSX::singleton->push_input(ev);
-		ev.mouse_button.pressed=false;
-		OS_OSX::singleton->push_input(ev);
+        sendScrollEvent( 0 < deltaY ? BUTTON_WHEEL_UP : BUTTON_WHEEL_DOWN, fabs(deltaY * 0.3));
 	}
 }
 

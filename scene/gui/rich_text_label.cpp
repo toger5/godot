@@ -838,12 +838,12 @@ void RichTextLabel::_input_event(InputEvent p_event) {
 			if (b.button_index==BUTTON_WHEEL_UP) {
 
 				if (scroll_active)
-					vscroll->set_val( vscroll->get_val()-vscroll->get_page()/8 );
+					vscroll->set_value( vscroll->get_value()-vscroll->get_page()*b.factor*0.5/8 );
 			}
 			if (b.button_index==BUTTON_WHEEL_DOWN) {
 
 				if (scroll_active)
-					vscroll->set_val( vscroll->get_val()+vscroll->get_page()/8 );
+					vscroll->set_value( vscroll->get_value()+vscroll->get_page()*b.factor*0.5/8 );
 			}
 		} break;
 		case InputEvent::KEY: {

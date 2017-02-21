@@ -122,13 +122,13 @@ void SpinBox::_input_event(const InputEvent& p_event) {
 			} break;
 			case BUTTON_WHEEL_UP: {
 				if (line_edit->has_focus()) {
-					set_val( get_val() + get_step() );
+					set_value( get_value() + get_step()*mb.factor );
 					accept_event();
 				}
 			} break;
 			case BUTTON_WHEEL_DOWN: {
 				if (line_edit->has_focus()) {
-					set_val( get_val() - get_step() );
+					set_value( get_value() - get_step()*mb.factor );
 					accept_event();
 				}
 			} break;
