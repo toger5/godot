@@ -106,17 +106,17 @@ void ScrollContainer::_input_event(const InputEvent& p_input_event) {
 					v_scroll->set_val( v_scroll->get_val()+v_scroll->get_page()/8 );
 				}
 			}
-            if (mb.button_index==BUTTON_WHEEL_LEFT && mb.pressed) {
-                if (h_scroll->is_visible_in_tree()){
-                    h_scroll->set_value( h_scroll->get_value()-h_scroll->get_page()*mb.factor/8 );
-                }
-            }
-            
-            if (mb.button_index==BUTTON_WHEEL_RIGHT && mb.pressed) {
-                if (h_scroll->is_visible_in_tree()){
-                    h_scroll->set_value( h_scroll->get_value()+h_scroll->get_page()*mb.factor/8 );
-                }
-            }
+			if (mb.button_index==BUTTON_WHEEL_LEFT && mb.pressed) {
+				if (h_scroll->is_visible_in_tree()){
+					h_scroll->set_value( h_scroll->get_value()-h_scroll->get_page()*mb.factor/8 );
+				}
+			}
+			
+			if (mb.button_index==BUTTON_WHEEL_RIGHT && mb.pressed) {
+				if (h_scroll->is_visible_in_tree()){
+					h_scroll->set_value( h_scroll->get_value()+h_scroll->get_page()*mb.factor/8 );
+				}
+			}
 
 			if(!OS::get_singleton()->has_touchscreen_ui_hint())
 				return;
