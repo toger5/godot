@@ -4520,6 +4520,7 @@ PropertyEditor::PropertyEditor() {
 	tree->set_column_min_width(0,30);
 	tree->set_column_expand(1,true);
 	tree->set_column_min_width(1,18);
+	tree->add_constant_override("item_margin", 0);
 
 	//tree->set_hide_root(true);
 	add_child( tree );
