@@ -520,13 +520,15 @@ LRESULT OS_Windows::WndProc(HWND hWnd,UINT uMsg, WPARAM	wParam,	LPARAM	lParam) {
 					int motion = (short)HIWORD(wParam);
 					if (!motion)
 						return 0;
-
-					if (motion<0)
+					
+					if (motion<0){
 						mb.button_index = BUTTON_WHEEL_LEFT;
-					mb.factor = fabs((double)motion / (double)WHEEL_DELTA);
-					else
+						mb.factor = fabs((double)motion / (double)WHEEL_DELTA);
+					}
+					else{
 						mb.button_index = BUTTON_WHEEL_RIGHT;
-					mb.factor = fabs((double)motion / (double)WHEEL_DELTA);
+						mb.factor = fabs((double)motion / (double)WHEEL_DELTA);
+					}
 				} break;
 					/*
 				case WM_XBUTTONDOWN: {
