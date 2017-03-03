@@ -186,6 +186,7 @@ public:
 	/* VISIBILITY */
 
 	bool is_visible() const;
+	inline bool is_visible_in_tree() const { return is_visible(); }
 	bool is_hidden() const;
 	void show();
 	void hide();
