@@ -236,6 +236,7 @@ private:
 
 	//HSplitContainer *editor_hsplit;
 	//VSplitContainer *editor_vsplit;
+	Container *menu_headerContainer;
 	HBoxContainer *menu_hb;
 	Control *viewport;
 	MenuButton *file_menu;

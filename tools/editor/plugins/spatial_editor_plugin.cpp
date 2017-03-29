@@ -3236,7 +3236,7 @@ void SpatialEditor::_init_indicators() {
 
 		for(int i=0;i<3;i++) {
 			Vector3 axis;
-			axis[i]=1;
+			axis[i]=0.6;//toger
 			Vector3 axis_n1;
 			axis_n1[(i+1)%3]=1;
 			Vector3 axis_n2;
@@ -3250,11 +3250,11 @@ void SpatialEditor::_init_indicators() {
 
 			for(int j=-ORIGIN_GRID_SIZE;j<=ORIGIN_GRID_SIZE;j++) {
 
-
-				grid_colors[i].push_back(Color(axis.x,axis.y,axis.z,0.2));
-				grid_colors[i].push_back(Color(axis.x,axis.y,axis.z,0.2));
-				grid_colors[i].push_back(Color(axis.x,axis.y,axis.z,0.2));
-				grid_colors[i].push_back(Color(axis.x,axis.y,axis.z,0.2));
+				//toger
+				grid_colors[i].push_back(Color(1.0, 1.0, 1.0, 0.2));
+				grid_colors[i].push_back(Color(1.0, 1.0, 1.0, 0.2));
+				grid_colors[i].push_back(Color(1.0, 1.0, 1, 0.2));
+				grid_colors[i].push_back(Color(1.0, 1.0, 1.0, 0.2));
 				grid_points[i].push_back(axis_n1*ORIGIN_GRID_SIZE+axis_n2*j);
 				grid_points[i].push_back(-axis_n1*ORIGIN_GRID_SIZE+axis_n2*j);
 				grid_points[i].push_back(axis_n2*ORIGIN_GRID_SIZE+axis_n1*j);

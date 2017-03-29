@@ -188,7 +188,7 @@ void make_default_theme() {
 	Ref<Theme> t( memnew( Theme ) );
 
 	//Ref<Font> default_font = make_font(_bi_font_normal_height,_bi_font_normal_ascent,_bi_font_normal_valign,_bi_font_normal_charcount,_bi_font_normal_characters,make_icon(font_normal_png));
-	Ref<Font> default_font=make_font2(_builtin_normal_font_height,_builtin_normal_font_ascent,_builtin_normal_font_charcount,&_builtin_normal_font_charrects[0][0],_builtin_normal_font_kerning_pair_count,&_builtin_normal_font_kerning_pairs[0][0],_builtin_normal_font_img_width,_builtin_normal_font_img_height,_builtin_normal_font_img_data);
+	Ref<Font> default_font = make_font2(_builtin_normal_font_height, _builtin_normal_font_ascent, _builtin_normal_font_charcount, &_builtin_normal_font_charrects[0][0], _builtin_normal_font_kerning_pair_count, &_builtin_normal_font_kerning_pairs[0][0], _builtin_normal_font_img_width, _builtin_normal_font_img_height, _builtin_normal_font_img_data);
 	Ref<Font> source_font=make_font2(_builtin_source_font_height,_builtin_source_font_ascent,_builtin_source_font_charcount,&_builtin_source_font_charrects[0][0],_builtin_source_font_kerning_pair_count,&_builtin_source_font_kerning_pairs[0][0],_builtin_source_font_img_width,_builtin_source_font_img_height,_builtin_source_font_img_data);
 	Ref<Font> large_font=make_font2(_builtin_large_font_height,_builtin_large_font_ascent,_builtin_large_font_charcount,&_builtin_large_font_charrects[0][0],_builtin_large_font_kerning_pair_count,&_builtin_large_font_kerning_pairs[0][0],_builtin_large_font_img_width,_builtin_large_font_img_height,_builtin_large_font_img_data);
 
@@ -199,7 +199,7 @@ void make_default_theme() {
 	Color control_font_color_low = Color::html("b0b0b0");
 	Color control_font_color_hover = Color::html("f0f0f0");
 	Color control_font_color_disabled = Color(0.9,0.9,0.9,0.2);
-	Color control_font_color_pressed = Color::html("ffffff");
+	Color control_font_color_pressed = Color::html("7cc9ff");
 	Color font_color_selection = Color::html("7d7d7d");
 
 
@@ -455,7 +455,7 @@ void make_default_theme() {
 	t->set_stylebox("focus","TextEdit", focus );
 	t->set_stylebox("completion","TextEdit", make_stylebox( tree_bg_png,3,3,3,3) );
 
-	t->set_icon("tab","TextEdit", make_icon( tab_png) );
+	t->set_icon("tab","TextEdit", make_icon(tab_png) );
 
 	t->set_font("font","TextEdit", default_font );
 
@@ -654,7 +654,7 @@ void make_default_theme() {
 	t->set_color("font_color_selected","Tree", control_font_color_pressed );
 	t->set_color("selection_color","Tree", Color(0.1,0.1,1,0.8) );
 	t->set_color("cursor_color","Tree", Color(0,0,0) );
-	t->set_color("guide_color","Tree", Color(0,0,0,0.1) );
+	t->set_color("guide_color","Tree", Color(0,0,0,0) );
 
 	t->set_constant("hseparation","Tree",4);
 	t->set_constant("vseparation","Tree",4);
@@ -690,14 +690,14 @@ void make_default_theme() {
 
 
 	// TabContainer
-
-	Ref<StyleBoxTexture> tc_sb = sb_expand( make_stylebox( tab_container_bg_png,4,4,4,4,4,4,4,4),3,3,3,3);
+           																		//toger 4 4 4 4
+	Ref<StyleBoxTexture> tc_sb = sb_expand( make_stylebox( tab_container_bg_png,4,4,4,4,0,4,0,0),0,0,0,0);
 
 	tc_sb->set_expand_margin_size(MARGIN_TOP,2);
-	tc_sb->set_default_margin(MARGIN_TOP,8);
-
-	t->set_stylebox("tab_fg","TabContainer", sb_expand( make_stylebox( tab_current_png,4,4,4,1,16,4,16,4),2,2,2,2) );
-	t->set_stylebox("tab_bg","TabContainer", sb_expand( make_stylebox( tab_behind_png,5,5,5,1,16,6,16,4),3,0,3,3) );
+	tc_sb->set_default_margin(MARGIN_TOP,0);
+                                                                                     //toger 16 4 16 4  2 2 2 2
+	t->set_stylebox("tab_fg","TabContainer", sb_expand( make_stylebox( tab_current_png,4,4,4,1,16,2,16,5),0,3,0,3) );
+	t->set_stylebox("tab_bg","TabContainer", sb_expand( make_stylebox( tab_behind_png, 5,5,5,1,16,2,16,5),0,3,0,3) );
 	t->set_stylebox("panel","TabContainer", tc_sb );
 
 	t->set_icon("increment","TabContainer",make_icon( scroll_button_right_png));
@@ -712,7 +712,7 @@ void make_default_theme() {
 	t->set_color("font_color_fg","TabContainer", control_font_color_hover );
 	t->set_color("font_color_bg","TabContainer", control_font_color_low );
 
-	t->set_constant("side_margin","TabContainer", 8 );
+	//t->set_constant("side_margin","TabContainer", 8 );//war 8
 	t->set_constant("top_margin","TabContainer", 24);
 	t->set_constant("label_valign_fg","TabContainer", 0);
 	t->set_constant("label_valign_bg","TabContainer", 2);
@@ -721,9 +721,9 @@ void make_default_theme() {
 
 
 	// Tabs
-
-	t->set_stylebox("tab_fg","Tabs", sb_expand( make_stylebox( tab_current_png,4,3,4,1,16,3,16,2),2,2,2,2) );
-	t->set_stylebox("tab_bg","Tabs", sb_expand( make_stylebox( tab_behind_png,5,4,5,1,16,5,16,2),3,3,3,3) );
+                                                                                        //toger 2,2,2,2
+	t->set_stylebox("tab_fg","Tabs", sb_expand( make_stylebox( tab_current_png,4,4,4,1,16,1,16,2),0,3,0,3) );
+	t->set_stylebox("tab_bg","Tabs", sb_expand( make_stylebox( tab_behind_png, 4,4,4,1,16,1,16,2),0,3,0,3) );
 	t->set_stylebox("panel","Tabs",tc_sb );
 	t->set_stylebox("button_pressed","Tabs", make_stylebox( button_pressed_png,4,4,4,4) );
 	t->set_stylebox("button","Tabs", make_stylebox( button_normal_png,4,4,4,4) );
@@ -735,6 +735,7 @@ void make_default_theme() {
 	t->set_icon("close","Tabs",make_icon( tab_close_png));
 
 	t->set_font("font","Tabs", default_font );
+	t->set_font("bold_font", "Tabs", default_font);
 
 	t->set_color("font_color_fg","Tabs", control_font_color_hover );
 	t->set_color("font_color_bg","Tabs", control_font_color_low );
@@ -887,11 +888,11 @@ void make_default_theme() {
 	Ref<StyleBoxTexture> ttnc = make_stylebox( full_panel_bg_png,8,8,8,8);
 	ttnc->set_draw_center(false);
 
-	t->set_stylebox("border","ReferenceFrame", make_stylebox( reference_border_png,4,4,4,4) );
+	t->set_stylebox("border","ReferenceFrame", make_stylebox( reference_border_png,4,4,4,0) );
 	t->set_stylebox("panelnc","Panel", ttnc );
 	t->set_stylebox("panelf","Panel", tc_sb );
-
-	Ref<StyleBoxTexture> sb_pc = make_stylebox( tab_container_bg_png,4,4,4,4,7,7,7,7);
+																		//toger 7 7 7 7
+	Ref<StyleBoxTexture> sb_pc = make_stylebox( tab_container_bg_png,4,4,4,4,0,0,0,0);
 	t->set_stylebox("panel","PanelContainer", sb_pc );
 
 
@@ -956,6 +957,3 @@ void clear_default_theme() {
 	Theme::set_default_font( Ref< Font >() );
 
 }
-
-
-

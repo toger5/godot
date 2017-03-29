@@ -253,7 +253,9 @@ void Tabs::_notification(int p_what) {
 
 			Ref<StyleBox> tab_bg = get_stylebox("tab_bg");
 			Ref<StyleBox> tab_fg = get_stylebox("tab_fg");
-			Ref<Font> font = get_font("font");
+			Ref<Font> normal_font = get_font("font");
+			//toger
+			Ref<Font> bold_font = get_font("bold_font");
 			Color color_fg = get_color("font_color_fg");
 			Color color_bg = get_color("font_color_bg");
 			Ref<Texture> close=get_icon("close");
@@ -315,7 +317,7 @@ void Tabs::_notification(int p_what) {
 
 				String s = tabs[i].text;
 				int lsize=0;
-				int slen=font->get_string_size(s).width;
+				int slen= normal_font->get_string_size(s).width;
 				lsize+=slen;
 
 
@@ -360,7 +362,7 @@ void Tabs::_notification(int p_what) {
 				}
 
 
-
+				Ref<Font> fo;
 				Ref<StyleBox> sb;
 				int va;
 				Color col;
@@ -370,10 +372,12 @@ void Tabs::_notification(int p_what) {
 					sb=tab_fg;
 					va=label_valign_fg;
 					col=color_fg;
+					fo = bold_font;//toger
 				} else {
 					sb=tab_bg;
 					va=label_valign_bg;
 					col=color_bg;
+					fo = normal_font;//toger
 				}
 
 
@@ -391,7 +395,9 @@ void Tabs::_notification(int p_what) {
 
 				}
 
-				font->draw(ci, Point2i( w, sb->get_margin(MARGIN_TOP)+((sb_rect.size.y-sb_ms.y)-font->get_height())/2+font->get_ascent() ), s, col );
+				//toger
+				fo->draw(ci, Point2i( w, sb->get_margin(MARGIN_TOP)+((sb_rect.size.y-sb_ms.y)- fo->get_height())/2+ fo->get_ascent() ), s, col );
+				//font->draw(ci, Point2i( w, sb->get_margin(MARGIN_TOP)+((sb_rect.size.y-sb_ms.y)-font->get_height())/2+font->get_ascent() ), s, col );
 
 				w+=slen;
 

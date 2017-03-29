@@ -5064,6 +5064,7 @@ EditorNode::EditorNode() {
 	main_vbox = memnew( VBoxContainer );
 	gui_base->add_child(main_vbox);
 	main_vbox->set_area_as_parent_rect(8);
+	main_vbox->set("custom_constants/separation",15);
 
 #if 0
 	PanelContainer *top_dark_panel = memnew( PanelContainer );
@@ -5086,7 +5087,14 @@ EditorNode::EditorNode() {
 
 
 	menu_hb = memnew( HBoxContainer );
+	//toger added line to set min size
+	//menu_hb->set_custom_minimum_size(Size2(0.0, 15.0));
+	//menu_headerContainer = memnew( Container );
+	//menu_headerContainer->set_custom_minimum_size(Vector2(0, 40));
+	//menu_headerContainer->set_anchor_and_margin(MARGIN_RIGHT, Control::ANCHOR_END, 0);
+	//menu_headerContainer->add_child(menu_hb);
 	main_vbox->add_child(menu_hb);
+	//main_vbox->add_child(menu_headerContainer);
 
 //	top_dark_vb->add_child(scene_tabs);
 	//left
@@ -5209,12 +5217,12 @@ EditorNode::EditorNode() {
 		dock_slot[i]->set_popup(dock_select_popoup);
 		dock_slot[i]->connect("pre_popup_pressed",this,"_dock_pre_popup",varray(i));
 
-		//dock_slot[i]->set_tab_align(TabContainer::ALIGN_LEFT);
+		dock_slot[i]->set_tab_align(TabContainer::ALIGN_LEFT);
 	}
 
 	dock_drag_timer = memnew( Timer );
 	add_child(dock_drag_timer);
-	dock_drag_timer->set_wait_time(0.5);
+	dock_drag_timer->set_wait_time(0.1);
 	dock_drag_timer->set_one_shot(true);
 	dock_drag_timer->connect("timeout",this,"_save_docks");
 
@@ -5235,7 +5243,7 @@ EditorNode::EditorNode() {
 */
 	scene_tabs=memnew( Tabs );
 	scene_tabs->add_tab("unsaved");
-	scene_tabs->set_tab_align(Tabs::ALIGN_CENTER);
+	scene_tabs->set_tab_align(Tabs::ALIGN_LEFT);
 	scene_tabs->set_tab_close_display_policy( (bool(EDITOR_DEF("global/always_show_close_button_in_scene_tabs", false)) ? Tabs::CLOSE_BUTTON_SHOW_ALWAYS : Tabs::CLOSE_BUTTON_SHOW_ACTIVE_ONLY) );
 	scene_tabs->connect("tab_changed",this,"_scene_tab_changed");
 	scene_tabs->connect("right_button_pressed",this,"_scene_tab_script_edited");
@@ -5273,15 +5281,22 @@ EditorNode::EditorNode() {
 
 
 	viewport = memnew( VBoxContainer );
+
 	viewport->set_v_size_flags(Control::SIZE_EXPAND_FILL);
+
+	//to get rid of the left and right margin of the window
 	/*for(int i=0;i<4;i++) {
-		viewport->set_margin(Margin(i),sp->get_margin(Margin(i)));
+		int extraMargin = 0;
+		if (i == 0) { extraMargin = -30;}
+		if (i == 2) { extraMargin = 3; }
+		viewport->set_margin(Margin(i), scene_root_parent->get_margin(Margin(i)) + extraMargin);
 	}*/
+
 	scene_root_parent->add_child(viewport);
 
 
 	PanelContainer *top_region = memnew( PanelContainer );
-	top_region->add_style_override("panel",gui_base->get_stylebox("hover","Button"));
+	top_region->add_style_override("panel", gui_base->get_stylebox("panel", "Panel"));
 	HBoxContainer *left_menu_hb = memnew( HBoxContainer );
 	top_region->add_child(left_menu_hb);
 	menu_hb->add_child(top_region);
@@ -5366,7 +5381,7 @@ EditorNode::EditorNode() {
 	}
 
 	PanelContainer *editor_region = memnew( PanelContainer );
-	editor_region->add_style_override("panel",gui_base->get_stylebox("hover","Button"));
+	editor_region->add_style_override("panel", gui_base->get_stylebox("panel", "Panel"));
 	main_editor_button_vb = memnew( HBoxContainer );
 	editor_region->add_child(main_editor_button_vb);
 	menu_hb->add_child(editor_region);
@@ -5443,7 +5458,7 @@ EditorNode::EditorNode() {
 	play_cc->set_margin(MARGIN_TOP,5);
 
 	top_region = memnew( PanelContainer );
-	top_region->add_style_override("panel",gui_base->get_stylebox("hover","Button"));
+	top_region->add_style_override("panel",gui_base->get_stylebox("normal","LineEdit"));
 	play_cc->add_child(top_region);
 
 	HBoxContainer *play_hb = memnew( HBoxContainer );
@@ -5553,7 +5568,7 @@ EditorNode::EditorNode() {
 
 
 	PanelContainer *vu_cont = memnew( PanelContainer );
-	vu_cont->add_style_override("panel",gui_base->get_stylebox("hover","Button"));
+	vu_cont->add_style_override("panel",gui_base->get_stylebox("panel", "Panel"));
 	menu_hb->add_child(vu_cont);
 
 	audio_vu = memnew( TextureProgress );
@@ -5576,7 +5591,7 @@ EditorNode::EditorNode() {
 
 
 	top_region = memnew( PanelContainer );
-	top_region->add_style_override("panel",gui_base->get_stylebox("hover","Button"));
+	top_region->add_style_override("panel",gui_base->get_stylebox("panel", "Panel"));
 	HBoxContainer *right_menu_hb = memnew( HBoxContainer );
 	top_region->add_child(right_menu_hb);
 	menu_hb->add_child(top_region);
@@ -5584,7 +5599,7 @@ EditorNode::EditorNode() {
 
 	settings_menu = memnew( MenuButton );
 	settings_menu->set_text("Settings");
-	//settings_menu->set_anchor(MARGIN_RIGHT,ANCHOR_END);
+	settings_menu->set_anchor(MARGIN_RIGHT, Control::ANCHOR_END); //this was commented toger
 	right_menu_hb->add_child( settings_menu );
 	p=settings_menu->get_popup();
 
@@ -5674,7 +5689,7 @@ EditorNode::EditorNode() {
 	prop_pallete->set_area_as_parent_rect();*/
 
 	VBoxContainer *prop_editor_base = memnew( VBoxContainer );
-	prop_editor_base->set_name("Inspector"); // Properties?
+	prop_editor_base->set_name("Properties"); // Inspector ? toger5
 	dock_slot[DOCK_SLOT_RIGHT_UL]->add_child(prop_editor_base);
 
 	HBoxContainer *prop_editor_hb = memnew( HBoxContainer );
@@ -6146,9 +6161,9 @@ EditorNode::EditorNode() {
 
 	Globals::get_singleton()->set("debug/indicators_enabled",true);
 	Globals::get_singleton()->set("render/room_cull_enabled",false);
-	theme->set_color("prop_category","Editor",Color::hex(0x3f3a44ff));
-	theme->set_color("prop_section","Editor",Color::hex(0x35313aff));
-	theme->set_color("prop_subsection","Editor",Color::hex(0x312e37ff));
+	theme->set_color("prop_category","Editor",Color::html("393f48"));
+	theme->set_color("prop_section","Editor",Color::html("32373f"));
+	theme->set_color("prop_subsection","Editor",Color::html("32373f"));
 	theme->set_color("fg_selected","Editor",Color::html("ffbd8e8e"));
 	theme->set_color("fg_error","Editor",Color::html("ffbd8e8e"));
 
