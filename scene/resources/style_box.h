@@ -156,12 +156,12 @@ public:
 	void set_corner_radius_BR(int radius);
 	void set_corner_radius_BL(int radius);
 	int get_smallest_corner_radius() const;
-	int* get_corner_radius() const;
+	int *get_corner_radius() const;
 	int get_corner_radius_TL() const;
 	int get_corner_radius_TR() const;
 	int get_corner_radius_BR() const;
 	int get_corner_radius_BL() const;
-	
+
 	void set_draw_center(bool p_draw);
 	bool get_draw_center() const;
 	virtual Size2 get_center_size() const;
@@ -172,30 +172,28 @@ public:
 	~StyleBoxFlat();
 };
 
-
 class StyleBoxRound : public StyleBoxFlat {
-	
+
 	GDCLASS(StyleBoxRound, StyleBoxFlat);
-	
+
 	int corner_radius[4];
-	
+
 public:
-	
 	void set_corner_radius(int radius);
 	void set_corner_radius_TL(int radius);
 	void set_corner_radius_TR(int radius);
 	void set_corner_radius_BR(int radius);
 	void set_corner_radius_BL(int radius);
-	
+
 	int get_smallest_corner_radius() const;
-	int* get_corner_radius() const;
+	int *get_corner_radius() const;
 	int get_corner_radius_TL() const;
 	int get_corner_radius_TR() const;
 	int get_corner_radius_BR() const;
 	int get_corner_radius_BL() const;
-	
+
 	virtual void draw(RID p_canvas_item, const Rect2 &p_rect) const = 0;
-	
+
 	StyleBoxRound();
 	~StyleBoxRound();
 };
