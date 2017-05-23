@@ -316,7 +316,6 @@ bool StyleBoxFlat::get_border_blend() const {
 
 	return blend;
 }
-
 void StyleBoxFlat::set_draw_center(bool p_draw) {
 
 	draw_center = p_draw;
@@ -335,7 +334,8 @@ void StyleBoxFlat::draw(RID p_canvas_item, const Rect2 &p_rect) const {
 
 	VisualServer *vs = VisualServer::get_singleton();
 	Rect2i r = p_rect;
-
+	
+//drawing border
 	for (int i = 0; i < border_size; i++) {
 
 		Color color_upleft = light_color;
@@ -415,4 +415,192 @@ StyleBoxFlat::StyleBoxFlat() {
 	additional_border_size[3] = 0;
 }
 StyleBoxFlat::~StyleBoxFlat() {
+}
+
+
+///////////
+
+//REF
+/*
+	func draw_rounded_rect_without_border(rect, corner_radius, col_light, col_dark, border_for_reference = 0):
+	var i = 0
+	for cr in corner_radius:
+	if cr * 2 > rect.size.height:
+	corner_radius[i] = rect.size.height / 2
+	if cr * 2 > rect.size.width:
+	corner_radius[i] = rect.size.width / 2
+	i += 1
+ #	rect = rect.grow( -corner_radius )
+	var tl = rect.pos + Vector2(corner_radius[0], corner_radius[0])
+	var tr = Vector2(rect.pos.x + rect.size.x - corner_radius[1], rect.pos.y + corner_radius[1])
+	var br = rect.pos + rect.size - Vector2(corner_radius[2], corner_radius[2])
+	var bl = Vector2(rect.pos.x + corner_radius[3], rect.pos.y + rect.size.y - corner_radius[3])
+	var corners = [tl,tr,br,bl]
+	i = 0
+	for corner_pos in corners:
+	var col = col_light
+	if i > 1:
+	col = col_dark
+	draw_circle(corner_pos, corner_radius[i], col)
+	i += 1
+ #	var rect_vertical = Rect2(rect.pos.x, rect.pos.y - corner_radius, rect.size.width, rect.size.height + 2 * corner_radius)
+ #	var rect_horizont = Rect2(rect.pos.x - corner_radius, rect.pos.y, rect.size.width + 2 * corner_radius, rect.size.height)
+ #	if corner_radius[2] < border_for_reference:
+ #		corner_radius[2] = border_for_reference
+	var rect_bottom_height = border_for_reference
+	if border_for_reference == 0:
+	rect_bottom_height = rect.size.height/2
+	var rect_top =		Rect2(rect.pos.x + corner_radius[0], 	rect.pos.y, 											rect.size.width - corner_radius[0] - corner_radius[1], rect.size.height/2)
+	var rect_bottom =	Rect2(rect.pos.x + corner_radius[3], 	rect.pos.y + rect.size.height - rect_bottom_height, 	rect.size.width - corner_radius[3] - corner_radius[2], rect_bottom_height)
+	var rect_left = 	Rect2(rect.pos.x, 						rect.pos.y + corner_radius[0], rect.size.width/2, 		rect.size.height - corner_radius[0] - corner_radius[3])
+	var rect_right = 	Rect2(rect.pos.x + rect.size.width/2, 	rect.pos.y + corner_radius[1], rect.size.width/2, 		rect.size.height - corner_radius[1] - corner_radius[2])
+	draw_rect(rect_top, col_light)
+	draw_rect(rect_left, col_light)
+	draw_rect(rect_right, col_light)
+	draw_rect(rect_bottom, col_dark)
+	
+	func draw_rounded_rect(rect, corner_radius, color, border_width, border_color_light, border_color_dark, blend_border):
+	if blend_border:
+	for i in range(0, border_width):
+	var factor = float(i) / float(border_width)
+	interp(border_color_light, color, i, border_width)
+	var interp_color_light = border_color_light.linear_interpolate(color, factor)
+	var interp_color_dark = border_color_dark.linear_interpolate(color, factor)
+	var inner_rect = rect.grow(-i)
+	if inner_rect.size.width > 0 and inner_rect.size.height > 0:
+	draw_rounded_rect_without_border(inner_rect, corner_radius, interp_color_light, interp_color_dark, border_width)
+	else:
+	draw_rounded_rect_without_border(rect, corner_radius, border_color_light, border_color_dark, border_width)
+	
+	var inner_rect = rect.grow(-border_width)
+	if inner_rect.size.width > 0 and inner_rect.size.height > 0:
+	draw_rounded_rect_without_border(inner_rect, corner_radius, color, color)
+	
+	
+ */
+//REF
+inline void draw_rounded_rect_without_border(VisualServer *vs, RID p_canvas_item, Rect2 rect, int corner_radius[4], Color col_light, Color col_dark, int border_for_reference = 0){
+	for(int i = 0; i < 4; i++){
+		if(corner_radius[i] * 2 > rect.size.height)
+			corner_radius[i] = rect.size.height / 2;
+		if(corner_radius[i] * 2 > rect.size.width)
+			corner_radius[i] = rect.size.width / 2;
+	}
+	
+	Vector2 tl = rect.pos + Vector2(corner_radius[0], corner_radius[0]);
+	Vector2 tr = Vector2(rect.pos.x + rect.size.x - corner_radius[1], rect.pos.y + corner_radius[1]);
+	Vector2 br = rect.pos + rect.size - Vector2(corner_radius[2], corner_radius[2]);
+	Vector2 bl = Vector2(rect.pos.x + corner_radius[3], rect.pos.y + rect.size.y - corner_radius[3]);
+	
+	PoolVector2Array corners = PoolVector2Array();
+	corners.append(tl);
+	corners.append(tr);
+	corners.append(br);
+	corners.append(bl);
+	
+	for(int i = 0; i < 4; i++){
+		
+		Color col = col_light;
+		if (i > 1)
+			col = col_dark;
+		vs->canvas_item_add_circle(p_canvas_item, corners[i], corner_radius[i], col);
+	}
+	
+	int rect_bottom_height = border_for_reference;
+	if (border_for_reference == 0)
+		rect_bottom_height = rect.size.height/2;
+	Rect2 rect_top = Rect2(rect.pos.x + corner_radius[0], rect.pos.y, rect.size.width - corner_radius[0] - corner_radius[1], rect.size.height/2);
+	Rect2 rect_bottom = Rect2(rect.pos.x + corner_radius[3], rect.pos.y + rect.size.height - rect_bottom_height, rect.size.width - corner_radius[3] - corner_radius[2], rect_bottom_height);
+	Rect2 rect_left = Rect2(rect.pos.x, rect.pos.y + corner_radius[0], rect.size.width/2, rect.size.height - corner_radius[0] - corner_radius[3]);
+	Rect2 rect_right = Rect2(rect.pos.x + rect.size.width/2, rect.pos.y + corner_radius[1], rect.size.width/2, rect.size.height - corner_radius[1] - corner_radius[2]);
+	
+	vs->canvas_item_add_rect(p_canvas_item, rect_top, col_light);
+	vs->canvas_item_add_rect(p_canvas_item, rect_left, col_light);
+	vs->canvas_item_add_rect(p_canvas_item, rect_right, col_light);
+	vs->canvas_item_add_rect(p_canvas_item, rect_bottom, col_dark);
+}
+inline void draw_rounded_rect(VisualServer *vs, RID p_canvas_item, Rect2i rect, int corner_radius[4], const Color color, const int border_width, const Color border_color_light, const Color border_color_dark, const bool blend_border){
+	if (blend_border){
+		for(int i = 0; i < border_width; i++){
+			float factor = float(i) / float(border_width);
+			Color interp_color_light = border_color_light.linear_interpolate(color, factor);
+			Color interp_color_dark = border_color_dark.linear_interpolate(color, factor);
+			Rect2i inner_rect = rect.grow(-i);
+			if (inner_rect.size.width > 0 && inner_rect.size.height > 0){
+				draw_rounded_rect_without_border(vs, p_canvas_item, inner_rect, corner_radius, interp_color_light, interp_color_dark, border_width);
+			}else{
+				draw_rounded_rect_without_border(vs, p_canvas_item, rect, corner_radius, border_color_light, border_color_dark, border_width);
+				break;
+			}
+		}
+	}
+	Rect2 inner_rect = rect.grow(-border_width);
+	if (inner_rect.size.width > 0 && inner_rect.size.height > 0)
+		draw_rounded_rect_without_border(vs, p_canvas_item, inner_rect, corner_radius, color, color);
+	
+}
+
+void StyleBoxRound::draw(RID p_canvas_item, const Rect2 &p_rect) const{
+	
+	VisualServer *vs = VisualServer::get_singleton();
+	Rect2i r = p_rect;
+	
+	draw_rounded_rect(*vs, p_canvas_item, r, get_bg_color(), get_border_size(), get_light_color(), get_dark_color(), get_border_blend());
+}
+int StyleBoxRound::get_corner_radius_TL() const{
+	
+	return corner_radius[0];
+}
+int StyleBoxRound::get_corner_radius_TR() const{
+	
+	return corner_radius[1];
+}
+int StyleBoxRound::get_corner_radius_BR() const{
+	
+	return corner_radius[2];
+}
+int StyleBoxRound::get_corner_radius_BL() const{
+	
+	return corner_radius[3];
+}
+int StyleBoxRound::get_smallest_corner_radius() const{
+	int smallest = corner_radius[0];
+	for(int i = 1; i < 4; i++){
+		if(smallest > corner_radius[i]){
+			smallest = corner_radius[i];
+		}
+	}
+	return smallest;
+}
+void StyleBoxRound::set_corner_radius(int radius){
+	
+	for(int i = 0; i < 4; i++){
+		corner_radius[i] = radius;
+	}
+}
+void StyleBoxRound::set_corner_radius_TL(int radius){
+	
+	corner_radius[0] = radius;
+}
+void StyleBoxRound::set_corner_radius_TR(int radius){
+	
+	corner_radius[1] = radius;
+}
+void StyleBoxRound::set_corner_radius_BR(int radius){
+	
+	corner_radius[2] = radius;
+}
+void StyleBoxRound::set_corner_radius_BL(int radius){
+	
+	corner_radius[3] = radius;
+}
+StyleBoxRound::StyleBoxRound() {
+
+	StyleBoxFlat::StyleBoxFlat();
+	corner_radius[0] = 0;
+	corner_radius[1] = 0;
+	corner_radius[2] = 0;
+	corner_radius[3] = 0;
+}
+StyleBoxRound::~StyleBoxRound() {
 }
