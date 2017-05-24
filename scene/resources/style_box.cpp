@@ -487,7 +487,7 @@ void StyleBoxFlat::set_corner_radius_BL(int radius) {
 //}
 
 inline void draw_rounded_rect(VisualServer *vs, RID p_canvas_item, Rect2 rect, const int const_corner_radius[4], Color col_top, Color col_bottom, Color col_left, Color col_right, int border, bool filled) {
-	int corner_radius[4] = { 10, 10, 10, 10 };
+	int corner_radius[4] = { const_corner_radius[0], const_corner_radius[1], const_corner_radius[2], const_corner_radius[3] };
 	//corner_radius[0] = const_corner_radius[0];// const_corner_radius[1], const_corner_radius[2], const_corner_radius[3] };
 	for (int i = 0; i < 4; i++) {
 		if (corner_radius[i] * 2 > rect.size.height)
