@@ -263,28 +263,38 @@ void StyleBoxFlat::set_bg_color(const Color &p_color) {
 	emit_changed();
 }
 
+void StyleBoxFlat::set_border_color(const Color &p_color, const Margin &p_border) {
+
+	border_color.write()[p_border] = p_color;
+	emit_changed();
+}
 void StyleBoxFlat::set_light_color(const Color &p_color) {
 
-	light_color = p_color;
+	set_border_color(p_color, MARGIN_LEFT);
+	set_border_color(p_color, MARGIN_TOP);
 	emit_changed();
 }
 void StyleBoxFlat::set_dark_color(const Color &p_color) {
 
-	dark_color = p_color;
+	set_border_color(p_color, MARGIN_RIGHT);
+	set_border_color(p_color, MARGIN_BOTTOM);
 	emit_changed();
 }
-
 Color StyleBoxFlat::get_bg_color() const {
 
 	return bg_color;
 }
+Color StyleBoxFlat::get_border_color(const Margin &p_border) const {
+
+	return border_color[p_border];
+}
 Color StyleBoxFlat::get_light_color() const {
 
-	return light_color;
+	return get_border_color(MARGIN_TOP);
 }
 Color StyleBoxFlat::get_dark_color() const {
 
-	return dark_color;
+	return get_border_color(MARGIN_BOTTOM);
 }
 
 void StyleBoxFlat::set_border_size(int p_size) {
@@ -318,12 +328,12 @@ bool StyleBoxFlat::get_border_blend() const {
 }
 void StyleBoxFlat::set_draw_center(bool p_draw) {
 
-	draw_center = p_draw;
+	//	draw_center = p_draw;
 	emit_changed();
 }
 bool StyleBoxFlat::get_draw_center() const {
 
-	return draw_center;
+	return true;
 }
 Size2 StyleBoxFlat::get_center_size() const {
 
@@ -334,7 +344,8 @@ void StyleBoxFlat::draw(RID p_canvas_item, const Rect2 &p_rect) const {
 
 	VisualServer *vs = VisualServer::get_singleton();
 	Rect2i r = p_rect;
-
+	Color light_color = border_color.read()[0];
+	Color dark_color = border_color.read()[2];
 	//drawing border
 	for (int i = 0; i < border_size; i++) {
 
@@ -363,7 +374,7 @@ void StyleBoxFlat::draw(RID p_canvas_item, const Rect2 &p_rect) const {
 		r.size.x -= 2;
 		r.size.y -= 2;
 	}
-
+	bool draw_center = true;
 	if (draw_center)
 		vs->canvas_item_add_rect(p_canvas_item, Rect2(r.pos, r.size), bg_color);
 
@@ -374,111 +385,103 @@ void StyleBoxFlat::draw(RID p_canvas_item, const Rect2 &p_rect) const {
 	vs->canvas_item_add_rect(p_canvas_item, Rect2(Point2i(r_add.pos.x - additional_border_size[MARGIN_LEFT], r_add.pos.y + r_add.size.height), Size2(r_add.size.width + additional_border_size[MARGIN_LEFT] + additional_border_size[MARGIN_RIGHT], additional_border_size[MARGIN_BOTTOM])), dark_color);
 }
 
+//float StyleBoxFlat::get_style_margin(Margin p_margin) const {
+//
+//	return border_size;
+//}
+
+int StyleBoxFlat::get_corner_radius_TL() const {
+
+	return corner_radius[0];
+}
+int StyleBoxFlat::get_corner_radius_TR() const {
+
+	return corner_radius[1];
+}
+int StyleBoxFlat::get_corner_radius_BR() const {
+
+	return corner_radius[2];
+}
+int StyleBoxFlat::get_corner_radius_BL() const {
+
+	return corner_radius[3];
+}
+
+PoolIntArray StyleBoxFlat::get_corner_radius() const {
+	PoolIntArray arr;
+	arr.append(corner_radius[0]);
+	arr.append(corner_radius[1]);
+	arr.append(corner_radius[2]);
+	arr.append(corner_radius[3]);
+	return arr;
+}
+
+int StyleBoxFlat::get_smallest_corner_radius() const {
+	int smallest = corner_radius[0];
+	for (int i = 1; i < 4; i++) {
+		if (smallest > corner_radius[i]) {
+			smallest = corner_radius[i];
+		}
+	}
+	return smallest;
+}
+void StyleBoxFlat::set_all_corner_radius(int radius) {
+
+	for (int i = 0; i < 4; i++) {
+		corner_radius[i] = radius;
+	}
+}
+void StyleBoxFlat::set_corner_radius(const int radius_top_left, const int radius_top_right, const int radius_botton_right, const int radius_bottom_left) {
+	corner_radius[0] = radius_top_left;
+	corner_radius[1] = radius_top_right;
+	corner_radius[2] = radius_botton_right;
+	corner_radius[3] = radius_bottom_left;
+}
+void StyleBoxFlat::set_corner_radius_TL(int radius) {
+
+	corner_radius[0] = radius;
+}
+void StyleBoxFlat::set_corner_radius_TR(int radius) {
+
+	corner_radius[1] = radius;
+}
+void StyleBoxFlat::set_corner_radius_BR(int radius) {
+
+	corner_radius[2] = radius;
+}
+void StyleBoxFlat::set_corner_radius_BL(int radius) {
+
+	corner_radius[3] = radius;
+}
 float StyleBoxFlat::get_style_margin(Margin p_margin) const {
-
-	return border_size;
-}
-void StyleBoxFlat::_bind_methods() {
-
-	ClassDB::bind_method(D_METHOD("set_bg_color", "color"), &StyleBoxFlat::set_bg_color);
-	ClassDB::bind_method(D_METHOD("get_bg_color"), &StyleBoxFlat::get_bg_color);
-	ClassDB::bind_method(D_METHOD("set_light_color", "color"), &StyleBoxFlat::set_light_color);
-	ClassDB::bind_method(D_METHOD("get_light_color"), &StyleBoxFlat::get_light_color);
-	ClassDB::bind_method(D_METHOD("set_dark_color", "color"), &StyleBoxFlat::set_dark_color);
-	ClassDB::bind_method(D_METHOD("get_dark_color"), &StyleBoxFlat::get_dark_color);
-	ClassDB::bind_method(D_METHOD("set_border_size", "size"), &StyleBoxFlat::set_border_size);
-	ClassDB::bind_method(D_METHOD("get_border_size"), &StyleBoxFlat::get_border_size);
-	ClassDB::bind_method(D_METHOD("set_border_blend", "blend"), &StyleBoxFlat::set_border_blend);
-	ClassDB::bind_method(D_METHOD("get_border_blend"), &StyleBoxFlat::get_border_blend);
-	ClassDB::bind_method(D_METHOD("set_draw_center", "size"), &StyleBoxFlat::set_draw_center);
-	ClassDB::bind_method(D_METHOD("get_draw_center"), &StyleBoxFlat::get_draw_center);
-
-	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "bg_color"), "set_bg_color", "get_bg_color");
-	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "light_color"), "set_light_color", "get_light_color");
-	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "dark_color"), "set_dark_color", "get_dark_color");
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "border_size", PROPERTY_HINT_RANGE, "0,4096"), "set_border_size", "get_border_size");
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "border_blend"), "set_border_blend", "get_border_blend");
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "draw_bg"), "set_draw_center", "get_draw_center");
-}
-
-StyleBoxFlat::StyleBoxFlat() {
-
-	bg_color = Color(0.6, 0.6, 0.6);
-	light_color = Color(0.8, 0.8, 0.8);
-	dark_color = Color(0.8, 0.8, 0.8);
-	draw_center = true;
-	blend = true;
-	border_size = 0;
-	additional_border_size[0] = 0;
-	additional_border_size[1] = 0;
-	additional_border_size[2] = 0;
-	additional_border_size[3] = 0;
-}
-StyleBoxFlat::~StyleBoxFlat() {
+	int margin_size = border_size;
+	switch (p_margin) {
+		case MARGIN_TOP:
+			if (get_corner_radius_TL() / 2 > margin_size)
+				margin_size = get_corner_radius_TL() / 2;
+			if (get_corner_radius_TR() / 2 > margin_size)
+				margin_size = get_corner_radius_TR() / 2;
+		case MARGIN_BOTTOM:
+			if (get_corner_radius_BL() / 2 > margin_size)
+				margin_size = get_corner_radius_BL() / 2;
+			if (get_corner_radius_BR() / 2 > margin_size)
+				margin_size = get_corner_radius_BR() / 2;
+		case MARGIN_LEFT:
+			if (get_corner_radius_TL() / 2 > margin_size)
+				margin_size = get_corner_radius_TL() / 2;
+			if (get_corner_radius_BL() / 2 > margin_size)
+				margin_size = get_corner_radius_BL() / 2;
+		case MARGIN_RIGHT:
+			if (get_corner_radius_TR() / 2 > margin_size)
+				margin_size = get_corner_radius_TR() / 2;
+			if (get_corner_radius_BR() / 2 > margin_size)
+				margin_size = get_corner_radius_BR() / 2;
+	}
+	return margin_size;
 }
 
-///////////
-
-//REF
-/*
-	func draw_rounded_rect_without_border(rect, corner_radius, col_light, col_dark, border_for_reference = 0):
-	var i = 0
-	for cr in corner_radius:
-	if cr * 2 > rect.size.height:
-	corner_radius[i] = rect.size.height / 2
-	if cr * 2 > rect.size.width:
-	corner_radius[i] = rect.size.width / 2
-	i += 1
- #	rect = rect.grow( -corner_radius )
-	var tl = rect.pos + Vector2(corner_radius[0], corner_radius[0])
-	var tr = Vector2(rect.pos.x + rect.size.x - corner_radius[1], rect.pos.y + corner_radius[1])
-	var br = rect.pos + rect.size - Vector2(corner_radius[2], corner_radius[2])
-	var bl = Vector2(rect.pos.x + corner_radius[3], rect.pos.y + rect.size.y - corner_radius[3])
-	var corners = [tl,tr,br,bl]
-	i = 0
-	for corner_pos in corners:
-	var col = col_light
-	if i > 1:
-	col = col_dark
-	draw_circle(corner_pos, corner_radius[i], col)
-	i += 1
- #	var rect_vertical = Rect2(rect.pos.x, rect.pos.y - corner_radius, rect.size.width, rect.size.height + 2 * corner_radius)
- #	var rect_horizont = Rect2(rect.pos.x - corner_radius, rect.pos.y, rect.size.width + 2 * corner_radius, rect.size.height)
- #	if corner_radius[2] < border_for_reference:
- #		corner_radius[2] = border_for_reference
-	var rect_bottom_height = border_for_reference
-	if border_for_reference == 0:
-	rect_bottom_height = rect.size.height/2
-	var rect_top =		Rect2(rect.pos.x + corner_radius[0], 	rect.pos.y, 											rect.size.width - corner_radius[0] - corner_radius[1], rect.size.height/2)
-	var rect_bottom =	Rect2(rect.pos.x + corner_radius[3], 	rect.pos.y + rect.size.height - rect_bottom_height, 	rect.size.width - corner_radius[3] - corner_radius[2], rect_bottom_height)
-	var rect_left = 	Rect2(rect.pos.x, 						rect.pos.y + corner_radius[0], rect.size.width/2, 		rect.size.height - corner_radius[0] - corner_radius[3])
-	var rect_right = 	Rect2(rect.pos.x + rect.size.width/2, 	rect.pos.y + corner_radius[1], rect.size.width/2, 		rect.size.height - corner_radius[1] - corner_radius[2])
-	draw_rect(rect_top, col_light)
-	draw_rect(rect_left, col_light)
-	draw_rect(rect_right, col_light)
-	draw_rect(rect_bottom, col_dark)
-	
-	func draw_rounded_rect(rect, corner_radius, color, border_width, border_color_light, border_color_dark, blend_border):
-	if blend_border:
-	for i in range(0, border_width):
-	var factor = float(i) / float(border_width)
-	interp(border_color_light, color, i, border_width)
-	var interp_color_light = border_color_light.linear_interpolate(color, factor)
-	var interp_color_dark = border_color_dark.linear_interpolate(color, factor)
-	var inner_rect = rect.grow(-i)
-	if inner_rect.size.width > 0 and inner_rect.size.height > 0:
-	draw_rounded_rect_without_border(inner_rect, corner_radius, interp_color_light, interp_color_dark, border_width)
-	else:
-	draw_rounded_rect_without_border(rect, corner_radius, border_color_light, border_color_dark, border_width)
-	
-	var inner_rect = rect.grow(-border_width)
-	if inner_rect.size.width > 0 and inner_rect.size.height > 0:
-	draw_rounded_rect_without_border(inner_rect, corner_radius, color, color)
-	
-	
- */
-//REF
-inline void draw_rounded_rect_without_border(VisualServer *vs, RID p_canvas_item, Rect2 rect, int corner_radius[4], Color col_light, Color col_dark, int border_for_reference = 0) {
+inline void draw_rounded_rect(VisualServer *vs, RID p_canvas_item, Rect2 rect, const int const_corner_radius[4], Color col_top, Color col_bottom, Color col_left, Color col_right, int border_for_reference = 0) {
+	int corner_radius[4] = { const_corner_radius[0], const_corner_radius[1], const_corner_radius[2], const_corner_radius[3] };
 	for (int i = 0; i < 4; i++) {
 		if (corner_radius[i] * 2 > rect.size.height)
 			corner_radius[i] = rect.size.height / 2;
@@ -499,9 +502,9 @@ inline void draw_rounded_rect_without_border(VisualServer *vs, RID p_canvas_item
 
 	for (int i = 0; i < 4; i++) {
 
-		Color col = col_light;
+		Color col = col_bottom;
 		if (i > 1)
-			col = col_dark;
+			col = col_top;
 		vs->canvas_item_add_circle(p_canvas_item, corners[i], corner_radius[i], col);
 	}
 
@@ -513,92 +516,111 @@ inline void draw_rounded_rect_without_border(VisualServer *vs, RID p_canvas_item
 	Rect2 rect_left = Rect2(rect.pos.x, rect.pos.y + corner_radius[0], rect.size.width / 2, rect.size.height - corner_radius[0] - corner_radius[3]);
 	Rect2 rect_right = Rect2(rect.pos.x + rect.size.width / 2, rect.pos.y + corner_radius[1], rect.size.width / 2, rect.size.height - corner_radius[1] - corner_radius[2]);
 
-	vs->canvas_item_add_rect(p_canvas_item, rect_top, col_light);
-	vs->canvas_item_add_rect(p_canvas_item, rect_left, col_light);
-	vs->canvas_item_add_rect(p_canvas_item, rect_right, col_light);
-	vs->canvas_item_add_rect(p_canvas_item, rect_bottom, col_dark);
+	vs->canvas_item_add_rect(p_canvas_item, rect_top, col_top);
+	vs->canvas_item_add_rect(p_canvas_item, rect_left, col_left);
+	vs->canvas_item_add_rect(p_canvas_item, rect_right, col_right);
+	//bottom has to be drawn last
+	vs->canvas_item_add_rect(p_canvas_item, rect_bottom, col_bottom);
 }
-inline void draw_rounded_rect(VisualServer *vs, RID p_canvas_item, Rect2i rect, int corner_radius[4], const Color color, const int border_width, const Color border_color_light, const Color border_color_dark, const bool blend_border) {
+inline void draw_rounded_rect_bordered(VisualServer *vs, RID p_canvas_item, Rect2i rect, const int corner_radius[4], Color color, int border_width, PoolColorArray b_col, bool blend_border) {
 	if (blend_border) {
 		for (int i = 0; i < border_width; i++) {
-			float factor = float(i) / float(border_width);
-			Color interp_color_light = border_color_light.linear_interpolate(color, factor);
-			Color interp_color_dark = border_color_dark.linear_interpolate(color, factor);
+			float factor = 1.0 - (float(i) / float(border_width));
+			PoolColorArray interp_color_array;
+			interp_color_array.resize(4);
+			PoolColorArray::Write color_w = interp_color_array.write();
+			for (int j = 0; j < 4; j++) {
+				color_w[j] = color.linear_interpolate(b_col.read()[j], factor);
+			}
+			PoolColorArray::Read color_r = interp_color_array.read();
 			Rect2i inner_rect = rect.grow(-i);
 			if (inner_rect.size.width > 0 && inner_rect.size.height > 0) {
-				draw_rounded_rect_without_border(vs, p_canvas_item, inner_rect, corner_radius, interp_color_light, interp_color_dark, border_width);
+				draw_rounded_rect(vs, p_canvas_item, inner_rect, corner_radius, color_r[MARGIN_TOP], color_r[MARGIN_BOTTOM], color_r[MARGIN_LEFT], color_r[MARGIN_RIGHT], border_width);
 			} else {
-				draw_rounded_rect_without_border(vs, p_canvas_item, rect, corner_radius, border_color_light, border_color_dark, border_width);
+				draw_rounded_rect(vs, p_canvas_item, rect, corner_radius, color_r[MARGIN_TOP], color_r[MARGIN_BOTTOM], color_r[MARGIN_LEFT], color_r[MARGIN_RIGHT], border_width);
 				break;
 			}
 		}
 	}
 	Rect2 inner_rect = rect.grow(-border_width);
 	if (inner_rect.size.width > 0 && inner_rect.size.height > 0)
-		draw_rounded_rect_without_border(vs, p_canvas_item, inner_rect, corner_radius, color, color);
+		draw_rounded_rect(vs, p_canvas_item, inner_rect, corner_radius, color, color, color, color);
+}
+//void StyleBoxFlat::draw(RID p_canvas_item, const Rect2 &p_rect) const {
+//
+//	VisualServer *vs = VisualServer::get_singleton();
+//	Rect2i r = p_rect;
+//
+////	draw_rounded_rect_bordered(vs, p_canvas_item, r, corner_radius, bg_color, get_border_size(), border_color, get_border_blend());
+//	vs->canvas_item_add_rect(p_canvas_item, r, bg_color);
+//	//draw additional borders
+//	Rect2i r_add = p_rect;
+//	//top border
+//	vs->canvas_item_add_rect(p_canvas_item, Rect2(Point2i(r_add.pos.x - additional_border_size[MARGIN_LEFT], r_add.pos.y - additional_border_size[MARGIN_TOP]), Size2(r_add.size.width + additional_border_size[MARGIN_LEFT] + additional_border_size[MARGIN_RIGHT], additional_border_size[MARGIN_TOP])), border_color[MARGIN_TOP]);
+//	//left border
+//	vs->canvas_item_add_rect(p_canvas_item, Rect2(Point2i(r_add.pos.x - additional_border_size[MARGIN_LEFT], r_add.pos.y), Size2(additional_border_size[MARGIN_LEFT], r_add.size.height)), border_color[MARGIN_LEFT]);
+//	//right border
+//	vs->canvas_item_add_rect(p_canvas_item, Rect2(Point2i(r_add.pos.x + r_add.size.width, r_add.pos.y), Size2(additional_border_size[MARGIN_RIGHT], r_add.size.height)), border_color[MARGIN_RIGHT]);
+//	//bottom border
+//	vs->canvas_item_add_rect(p_canvas_item, Rect2(Point2i(r_add.pos.x - additional_border_size[MARGIN_LEFT], r_add.pos.y + r_add.size.height), Size2(r_add.size.width + additional_border_size[MARGIN_LEFT] + additional_border_size[MARGIN_RIGHT], additional_border_size[MARGIN_BOTTOM])), border_color[MARGIN_BOTTOM]);
+//}
+void StyleBoxFlat::_bind_methods() {
+
+	ClassDB::bind_method(D_METHOD("set_bg_color", "color"), &StyleBoxFlat::set_bg_color);
+	ClassDB::bind_method(D_METHOD("get_bg_color"), &StyleBoxFlat::get_bg_color);
+	ClassDB::bind_method(D_METHOD("set_light_color", "color"), &StyleBoxFlat::set_light_color);
+	ClassDB::bind_method(D_METHOD("get_light_color"), &StyleBoxFlat::get_light_color);
+	ClassDB::bind_method(D_METHOD("set_dark_color", "color"), &StyleBoxFlat::set_dark_color);
+	ClassDB::bind_method(D_METHOD("get_dark_color"), &StyleBoxFlat::get_dark_color);
+	ClassDB::bind_method(D_METHOD("set_border_size", "size"), &StyleBoxFlat::set_border_size);
+	ClassDB::bind_method(D_METHOD("get_border_size"), &StyleBoxFlat::get_border_size);
+	ClassDB::bind_method(D_METHOD("set_border_blend", "blend"), &StyleBoxFlat::set_border_blend);
+	ClassDB::bind_method(D_METHOD("get_border_blend"), &StyleBoxFlat::get_border_blend);
+	ClassDB::bind_method(D_METHOD("set_draw_center", "size"), &StyleBoxFlat::set_draw_center);
+	ClassDB::bind_method(D_METHOD("get_draw_center"), &StyleBoxFlat::get_draw_center);
+
+	ClassDB::bind_method(D_METHOD("set_corner_radius_TL", "radius"), &StyleBoxFlat::set_corner_radius_TL);
+	ClassDB::bind_method(D_METHOD("set_corner_radius_TR", "radius"), &StyleBoxFlat::set_corner_radius_TR);
+	ClassDB::bind_method(D_METHOD("set_corner_radius_BL", "radius"), &StyleBoxFlat::set_corner_radius_BL);
+	ClassDB::bind_method(D_METHOD("set_corner_radius_BR", "radius"), &StyleBoxFlat::set_corner_radius_BR);
+
+	ClassDB::bind_method(D_METHOD("get_corner_radius_TL"), &StyleBoxFlat::get_corner_radius_TL);
+	ClassDB::bind_method(D_METHOD("get_corner_radius_TR"), &StyleBoxFlat::get_corner_radius_TR);
+	ClassDB::bind_method(D_METHOD("get_corner_radius_BL"), &StyleBoxFlat::get_corner_radius_BL);
+	ClassDB::bind_method(D_METHOD("get_corner_radius_BR"), &StyleBoxFlat::get_corner_radius_BR);
+
+	//	ClassDB::bind_method(D_METHOD("set_corner_radius", "radius_top_left", "radius_top_right", "radius_botton_right", "radius_bottom_left"), &StyleBoxFlat::set_corner_radius);
+	ClassDB::bind_method(D_METHOD("set_all_corner_radius", "radius"), &StyleBoxFlat::set_all_corner_radius);
+
+	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "bg_color"), "set_bg_color", "get_bg_color");
+	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "light_color"), "set_light_color", "get_light_color");
+	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "dark_color"), "set_dark_color", "get_dark_color");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "border_size", PROPERTY_HINT_RANGE, "0,4096"), "set_border_size", "get_border_size");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "border_blend"), "set_border_blend", "get_border_blend");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "draw_bg"), "set_draw_center", "get_draw_center");
 }
 
-void StyleBoxRound::draw(RID p_canvas_item, const Rect2 &p_rect) const {
+StyleBoxFlat::StyleBoxFlat() {
 
-	VisualServer *vs = VisualServer::get_singleton();
-	Rect2i r = p_rect;
+	bg_color = Color(0.6, 0.6, 0.6);
 
-	draw_rounded_rect(*vs, p_canvas_item, r, get_bg_color(), get_border_size(), get_light_color(), get_dark_color(), get_border_blend());
-}
-int StyleBoxRound::get_corner_radius_TL() const {
+	border_color.resize(4);
+	border_color.write()[0] = Color(0.8, 0.8, 0.8);
+	border_color.write()[1] = Color(0.8, 0.8, 0.8);
+	border_color.write()[2] = Color(0.8, 0.8, 0.8);
+	border_color.write()[3] = Color(0.8, 0.8, 0.8);
 
-	return corner_radius[0];
-}
-int StyleBoxRound::get_corner_radius_TR() const {
+	blend = true;
+	border_size = 0;
+	additional_border_size[0] = 0;
+	additional_border_size[1] = 0;
+	additional_border_size[2] = 0;
+	additional_border_size[3] = 0;
 
-	return corner_radius[1];
-}
-int StyleBoxRound::get_corner_radius_BR() const {
-
-	return corner_radius[2];
-}
-int StyleBoxRound::get_corner_radius_BL() const {
-
-	return corner_radius[3];
-}
-int StyleBoxRound::get_smallest_corner_radius() const {
-	int smallest = corner_radius[0];
-	for (int i = 1; i < 4; i++) {
-		if (smallest > corner_radius[i]) {
-			smallest = corner_radius[i];
-		}
-	}
-	return smallest;
-}
-void StyleBoxRound::set_corner_radius(int radius) {
-
-	for (int i = 0; i < 4; i++) {
-		corner_radius[i] = radius;
-	}
-}
-void StyleBoxRound::set_corner_radius_TL(int radius) {
-
-	corner_radius[0] = radius;
-}
-void StyleBoxRound::set_corner_radius_TR(int radius) {
-
-	corner_radius[1] = radius;
-}
-void StyleBoxRound::set_corner_radius_BR(int radius) {
-
-	corner_radius[2] = radius;
-}
-void StyleBoxRound::set_corner_radius_BL(int radius) {
-
-	corner_radius[3] = radius;
-}
-StyleBoxRound::StyleBoxRound() {
-
-	StyleBoxFlat::StyleBoxFlat();
 	corner_radius[0] = 0;
 	corner_radius[1] = 0;
 	corner_radius[2] = 0;
 	corner_radius[3] = 0;
 }
-StyleBoxRound::~StyleBoxRound() {
+StyleBoxFlat::~StyleBoxFlat() {
 }

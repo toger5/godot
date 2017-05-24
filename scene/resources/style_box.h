@@ -119,13 +119,13 @@ class StyleBoxFlat : public StyleBox {
 	GDCLASS(StyleBoxFlat, StyleBox);
 
 	Color bg_color;
-	Color light_color;
-	Color dark_color;
+	PoolColorArray border_color;
 
 	int border_size;
 	int additional_border_size[4];
+	int corner_radius[4];
 
-	bool draw_center;
+	//	bool draw_center;
 	bool blend;
 
 protected:
@@ -133,14 +133,20 @@ protected:
 	static void _bind_methods();
 
 public:
+	//Color
 	void set_bg_color(const Color &p_color);
+	void set_border_color(const Color &p_color, const Margin &p_border);
+
 	void set_light_color(const Color &p_color);
 	void set_dark_color(const Color &p_color);
 
+	Color get_border_color(const Margin &p_border) const;
 	Color get_bg_color() const;
+
 	Color get_light_color() const;
 	Color get_dark_color() const;
 
+	//Border
 	void set_border_size(int p_size);
 	int get_border_size() const;
 
@@ -150,13 +156,22 @@ public:
 	void set_border_blend(bool p_blend);
 	bool get_border_blend() const;
 
-	void set_corner_radius(int radius);
+	//Corner Radius
+	//set
+	void set_all_corner_radius(int radius);
+	void set_corner_radius(const int radius_top_left, const int radius_top_right, const int radius_botton_right, const int radius_bottom_left);
+
+	//individual
 	void set_corner_radius_TL(int radius);
 	void set_corner_radius_TR(int radius);
 	void set_corner_radius_BR(int radius);
 	void set_corner_radius_BL(int radius);
+
+	//get
+	PoolIntArray get_corner_radius() const;
 	int get_smallest_corner_radius() const;
-	int *get_corner_radius() const;
+
+	//individual
 	int get_corner_radius_TL() const;
 	int get_corner_radius_TR() const;
 	int get_corner_radius_BR() const;
@@ -172,29 +187,33 @@ public:
 	~StyleBoxFlat();
 };
 
-class StyleBoxRound : public StyleBoxFlat {
-
-	GDCLASS(StyleBoxRound, StyleBoxFlat);
-
-	int corner_radius[4];
-
-public:
-	void set_corner_radius(int radius);
-	void set_corner_radius_TL(int radius);
-	void set_corner_radius_TR(int radius);
-	void set_corner_radius_BR(int radius);
-	void set_corner_radius_BL(int radius);
-
-	int get_smallest_corner_radius() const;
-	int *get_corner_radius() const;
-	int get_corner_radius_TL() const;
-	int get_corner_radius_TR() const;
-	int get_corner_radius_BR() const;
-	int get_corner_radius_BL() const;
-
-	virtual void draw(RID p_canvas_item, const Rect2 &p_rect) const = 0;
-
-	StyleBoxRound();
-	~StyleBoxRound();
-};
+//class StyleBoxRound : public StyleBoxFlat {
+//
+//	GDCLASS(StyleBoxRound, StyleBoxFlat);
+//
+//	int corner_radius[4];
+//
+//protected:
+//	virtual float get_style_margin(Margin p_margin) const = 0;
+//	static void _bind_methods();
+//public:
+//	void set_corner_radius(int radius);
+//	void set_corner_radius_TL(int radius);
+//	void set_corner_radius_TR(int radius);
+//	void set_corner_radius_BR(int radius);
+//	void set_corner_radius_BL(int radius);
+//	void set_corner_radius(int radius_top_left, int radius_top_right, int radius_botton_right, int radius_bottom_left);
+//
+//	int get_smallest_corner_radius() const;
+//	PoolIntArray get_corner_radius() const;
+//	int get_corner_radius_TL() const;
+//	int get_corner_radius_TR() const;
+//	int get_corner_radius_BR() const;
+//	int get_corner_radius_BL() const;
+//
+//	virtual void draw(RID p_canvas_item, const Rect2 &p_rect) const = 0;
+//
+//	StyleBoxRound();
+//	~StyleBoxRound();
+//};
 #endif
