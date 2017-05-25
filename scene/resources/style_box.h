@@ -135,8 +135,8 @@ protected:
 public:
 	//Color
 	void set_bg_color(const Color &p_color);
+	void set_border_color(const Color &p_color);
 	void set_border_color(const Color &p_color, const Margin &p_border);
-
 	void set_light_color(const Color &p_color);
 	void set_dark_color(const Color &p_color);
 
