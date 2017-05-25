@@ -267,8 +267,10 @@ Ref<Theme> create_editor_theme() {
 
 	Ref<StyleBoxFlat> style_tab_fg = make_flat_stylebox(base_color, 15, 5, 15, 5);
 	style_tab_fg->set_corner_radius(15, 15, 0, 0);
-	Ref<StyleBoxFlat> style_tab_bg = make_flat_stylebox(base_color, 15, 5, 15, 5);
 	style_tab_bg->set_draw_center(false);
+	style_tab_bg->set_border_size(1 * EDSCALE);
+	style_tab_bg->set_border_color(HIGHLIGHT_COLOR_DARK);
+	style_tab_bg->set_border_color(Color(0, 0, 0, 0), MARGIN_BOTTOM);
 
 	// Tabs & TabContainer
 	theme->set_stylebox("tab_fg", "TabContainer", style_tab_fg);
@@ -295,8 +297,10 @@ Ref<Theme> create_editor_theme() {
 	Ref<StyleBoxFlat> style_lineedit = make_flat_stylebox(dark_color_1, 4, 4, 4, 4);
 	style_lineedit->set_border_size(1 * EDSCALE);
 	style_lineedit = change_border_color(style_lineedit, light_color_1);
+	style_lineedit->set_all_corner_radius(100);
 	Ref<StyleBoxFlat> style_lineedit_disabled = style_lineedit->duplicate();
 	style_lineedit_disabled->set_bg_color(light_color_1);
+	style_lineedit_disabled->set_all_corner_radius(100);
 	Ref<StyleBoxFlat> style_lineedit_focus = change_border_color(style_lineedit, highlight_color);
 	style_lineedit_focus->set_draw_center(false);
 	theme->set_stylebox("normal", "LineEdit", style_lineedit);
