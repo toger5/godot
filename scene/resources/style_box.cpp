@@ -346,52 +346,6 @@ Size2 StyleBoxFlat::get_center_size() const {
 
 	return Size2();
 }
-
-//void StyleBoxFlat::draw(RID p_canvas_item, const Rect2 &p_rect) const {
-//
-//	VisualServer *vs = VisualServer::get_singleton();
-//	Rect2i r = p_rect;
-//	Color light_color = border_color.read()[0];
-//	Color dark_color = border_color.read()[2];
-//	//drawing border
-//	for (int i = 0; i < border_size; i++) {
-//
-//		Color color_upleft = light_color;
-//		Color color_downright = dark_color;
-//
-//		if (blend) {
-//
-//			color_upleft.r = (border_size - i) * color_upleft.r / border_size + i * bg_color.r / border_size;
-//			color_upleft.g = (border_size - i) * color_upleft.g / border_size + i * bg_color.g / border_size;
-//			color_upleft.b = (border_size - i) * color_upleft.b / border_size + i * bg_color.b / border_size;
-//
-//			color_downright.r = (border_size - i) * color_downright.r / border_size + i * bg_color.r / border_size;
-//			color_downright.g = (border_size - i) * color_downright.g / border_size + i * bg_color.g / border_size;
-//			color_downright.b = (border_size - i) * color_downright.b / border_size + i * bg_color.b / border_size;
-//		}
-//
-//		vs->canvas_item_add_rect(p_canvas_item, Rect2(Point2i(r.pos.x, r.pos.y + r.size.y - 1), Size2(r.size.x, 1)), color_downright);
-//		vs->canvas_item_add_rect(p_canvas_item, Rect2(Point2i(r.pos.x + r.size.x - 1, r.pos.y), Size2(1, r.size.y)), color_downright);
-//
-//		vs->canvas_item_add_rect(p_canvas_item, Rect2(r.pos, Size2(r.size.x, 1)), color_upleft);
-//		vs->canvas_item_add_rect(p_canvas_item, Rect2(r.pos, Size2(1, r.size.y)), color_upleft);
-//
-//		r.pos.x++;
-//		r.pos.y++;
-//		r.size.x -= 2;
-//		r.size.y -= 2;
-//	}
-//	bool draw_center = true;
-//	if (draw_center)
-//		vs->canvas_item_add_rect(p_canvas_item, Rect2(r.pos, r.size), bg_color);
-//
-//	Rect2i r_add = p_rect;
-//	vs->canvas_item_add_rect(p_canvas_item, Rect2(Point2i(r_add.pos.x - additional_border_size[MARGIN_LEFT], r_add.pos.y - additional_border_size[MARGIN_TOP]), Size2(r_add.size.width + additional_border_size[MARGIN_LEFT] + additional_border_size[MARGIN_RIGHT], additional_border_size[MARGIN_TOP])), light_color);
-//	vs->canvas_item_add_rect(p_canvas_item, Rect2(Point2i(r_add.pos.x - additional_border_size[MARGIN_LEFT], r_add.pos.y), Size2(additional_border_size[MARGIN_LEFT], r_add.size.height)), light_color);
-//	vs->canvas_item_add_rect(p_canvas_item, Rect2(Point2i(r_add.pos.x + r_add.size.width, r_add.pos.y), Size2(additional_border_size[MARGIN_RIGHT], r_add.size.height)), dark_color);
-//	vs->canvas_item_add_rect(p_canvas_item, Rect2(Point2i(r_add.pos.x - additional_border_size[MARGIN_LEFT], r_add.pos.y + r_add.size.height), Size2(r_add.size.width + additional_border_size[MARGIN_LEFT] + additional_border_size[MARGIN_RIGHT], additional_border_size[MARGIN_BOTTOM])), dark_color);
-//}
-
 int StyleBoxFlat::get_corner_radius_TL() const {
 
 	return corner_radius[0];
@@ -531,6 +485,8 @@ inline void draw_rounded_rect(VisualServer *vs, RID p_canvas_item, Rect2 rect, c
 			col = col_bottom;
 
 		if (filled) {
+			//the circle has to be drawn twice, otherwise the circles for the corners are not visible
+			//super buggy ;)
 			vs->canvas_item_add_circle(p_canvas_item, corners[i], (float)corner_radius[i], col);
 			vs->canvas_item_add_circle(p_canvas_item, corners[i], (float)corner_radius[i], col);
 		} else {
@@ -570,11 +526,7 @@ inline int *get_offset_corner_radius(int offset, const int *corner_radius) {
 	return p;
 }
 inline void draw_rounded_rect_bordered(VisualServer *vs, RID p_canvas_item, Rect2i rect, const int corner_radius[4], Color color, int border_width, PoolColorArray b_col, bool blend_border) {
-	PoolColorArray::Read color_read = b_col.read();
-	//the rounded rect has to be drawn twice, otherwise the circles for the corners are not visible
-	//super buggy ;)
-	//	draw_rounded_rect(vs, p_canvas_item, rect, get_offset_corner_radius(0, corner_radius), color_read[MARGIN_TOP], color_read[MARGIN_BOTTOM], color_read[MARGIN_LEFT], color_read[MARGIN_RIGHT], border_width, false);
-	draw_rounded_rect(vs, p_canvas_item, rect, get_offset_corner_radius(0, corner_radius), color_read[MARGIN_TOP], color_read[MARGIN_BOTTOM], color_read[MARGIN_LEFT], color_read[MARGIN_RIGHT], border_width, false);
+	draw_rounded_rect(vs, p_canvas_item, rect, get_offset_corner_radius(0, corner_radius), b_col[MARGIN_TOP], b_col[MARGIN_BOTTOM], b_col[MARGIN_LEFT], b_col[MARGIN_RIGHT], border_width, false);
 	if (false) {
 		for (int i = 0; i < border_width; i++) {
 			float factor = 1.0 - (float(i) / float(border_width));
@@ -601,7 +553,7 @@ void StyleBoxFlat::draw(RID p_canvas_item, const Rect2 &p_rect) const {
 
 	VisualServer *vs = VisualServer::get_singleton();
 	Rect2i r = p_rect;
-	int rad[4] = { 8, 8, 8, 8 };
+
 	draw_rounded_rect_bordered(vs, p_canvas_item, r, corner_radius, bg_color, border_size, border_color, blend);
 
 	//draw additional borders
