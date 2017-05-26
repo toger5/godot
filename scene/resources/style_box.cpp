@@ -442,8 +442,10 @@ float StyleBoxFlat::get_style_margin(Margin p_margin) const {
 	return margin_size;
 }
 inline void draw_arc(VisualServer *vs, RID p_canvas_item, Point2 pos, int corner_index, float corner_radius, Color col /*, float border*/) {
-	//	int vert_count = corner_radius/4;
-	int vert_count = 32;
+	int vert_count = 16;
+	if (corner_radius > 10) {
+		vert_count = 32;
+	}
 	vert_count = vert_count + (4 - vert_count % 4);
 	float offset[4] = { 0.5, 0.75, 0, 0.25 };
 	float factor = offset[corner_index];
@@ -481,17 +483,17 @@ inline void draw_rounded_rect(VisualServer *vs, RID p_canvas_item, Rect2 rect, P
 	for (int i = 0; i < 4; i++) {
 
 		Color col = col_top;
+		float rad = (float)corner_radius[i];
 		if (i > 1)
 			col = col_bottom;
 
 		if (filled) {
 			//the circle has to be drawn twice, otherwise the circles for the corners are not visible
 			//super buggy ;)
-			vs->canvas_item_add_circle(p_canvas_item, corners[i], (float)corner_radius[i], col);
-			vs->canvas_item_add_circle(p_canvas_item, corners[i], (float)corner_radius[i], col);
+			vs->canvas_item_add_circle(p_canvas_item, corners[i], rad, col);
 		} else {
 			for (float j = 0; j < border; j += 1) {
-				draw_arc(vs, p_canvas_item, corners[i], i, (float)corner_radius[i] - j, col);
+				draw_arc(vs, p_canvas_item, corners[i], i, rad - j, col);
 			}
 		}
 	}
@@ -598,8 +600,13 @@ void StyleBoxFlat::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_corner_radius_BL"), &StyleBoxFlat::get_corner_radius_BL);
 	ClassDB::bind_method(D_METHOD("get_corner_radius_BR"), &StyleBoxFlat::get_corner_radius_BR);
 
-	//	ClassDB::bind_method(D_METHOD("set_corner_radius", "radius_top_left", "radius_top_right", "radius_botton_right", "radius_bottom_left"), &StyleBoxFlat::set_corner_radius);
+	ClassDB::bind_method(D_METHOD("set_corner_radius", "radius_top_left", "radius_top_right", "radius_botton_right", "radius_bottom_left"), &StyleBoxFlat::set_corner_radius);
 	ClassDB::bind_method(D_METHOD("set_all_corner_radius", "radius"), &StyleBoxFlat::set_all_corner_radius);
+
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "corner_radius_TL"), "set_corner_radius_TL", "get_corner_radius_TL");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "corner_radius_TR"), "set_corner_radius_TR", "get_corner_radius_TR");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "corner_radius_BR"), "set_corner_radius_BR", "get_corner_radius_BR");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "corner_radius_BL"), "set_corner_radius_BL", "get_corner_radius_BL");
 
 	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "bg_color"), "set_bg_color", "get_bg_color");
 	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "light_color"), "set_light_color", "get_light_color");
