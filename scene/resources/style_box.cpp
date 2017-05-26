@@ -480,6 +480,7 @@ float StyleBoxFlat::get_style_margin(Margin p_margin) const {
 	}
 	return margin_size;
 }
+
 inline void draw_arc(VisualServer *vs, RID p_canvas_item, Point2 pos, int corner_index, float corner_radius, Color col /*, float border*/) {
 	int vert_count = 16;
 	if (corner_radius > 10) {
