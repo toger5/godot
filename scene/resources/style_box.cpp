@@ -456,14 +456,14 @@ inline void draw_arc(VisualServer *vs, RID p_canvas_item, Point2 pos, int corner
 		from = to;
 	}
 }
-inline void draw_rounded_rect(VisualServer *vs, RID p_canvas_item, Rect2 rect, const int const_corner_radius[4], Color col_top, Color col_bottom, Color col_left, Color col_right, int border, bool filled) {
+inline void draw_rounded_rect(VisualServer *vs, RID p_canvas_item, Rect2 rect, PoolIntArray corner_radius, Color col_top, Color col_bottom, Color col_left, Color col_right, int border, bool filled) {
 
-	int corner_radius[4] = { const_corner_radius[0], const_corner_radius[1], const_corner_radius[2], const_corner_radius[3] };
+	PoolIntArray::Write corner_radius_w = corner_radius.write();
 	for (int i = 0; i < 4; i++) {
 		if (corner_radius[i] * 2 > rect.size.height)
-			corner_radius[i] = rect.size.height / 2;
+			corner_radius_w[i] = rect.size.height / 2;
 		if (corner_radius[i] * 2 > rect.size.width)
-			corner_radius[i] = rect.size.width / 2;
+			corner_radius_w[i] = rect.size.width / 2;
 	}
 
 	Point2 tl = rect.pos + Vector2(corner_radius[0], corner_radius[0]);
@@ -471,7 +471,7 @@ inline void draw_rounded_rect(VisualServer *vs, RID p_canvas_item, Rect2 rect, c
 	Point2 br = rect.pos + rect.size - Vector2(corner_radius[2], corner_radius[2]);
 	Point2 bl = Point2(rect.pos.x + corner_radius[3], rect.pos.y + rect.size.y - corner_radius[3]);
 
-	PoolVector2Array corners = PoolVector2Array();
+	PoolVector2Array corners; // = PoolVector2Array();
 	corners.append(tl);
 	corners.append(tr);
 	corners.append(br);
@@ -514,20 +514,20 @@ inline void draw_rounded_rect(VisualServer *vs, RID p_canvas_item, Rect2 rect, c
 	//has to be drawn last
 	vs->canvas_item_add_rect(p_canvas_item, rect_bottom, col_bottom);
 }
-inline int *get_offset_corner_radius(int offset, const int *corner_radius) {
-	int inner_corner_radius[4];
+inline PoolIntArray get_offset_corner_radius(int offset, PoolIntArray corner_radius) {
+	PoolIntArray inner_corner_radius = PoolIntArray();
+	inner_corner_radius.resize(4);
 	for (int i = 0; i < 4; i++) {
 		int rad = corner_radius[i] - offset;
 		if (rad < 0)
 			rad = 0;
-		inner_corner_radius[i] = rad;
+		inner_corner_radius.write()[i] = rad;
 	}
-	int *p = &inner_corner_radius[0];
-	return p;
+	return inner_corner_radius;
 }
-inline void draw_rounded_rect_bordered(VisualServer *vs, RID p_canvas_item, Rect2i rect, const int corner_radius[4], Color color, int border_width, PoolColorArray b_col, bool blend_border) {
-	draw_rounded_rect(vs, p_canvas_item, rect, get_offset_corner_radius(0, corner_radius), b_col[MARGIN_TOP], b_col[MARGIN_BOTTOM], b_col[MARGIN_LEFT], b_col[MARGIN_RIGHT], border_width, false);
-	if (false) {
+inline void draw_rounded_rect_bordered(VisualServer *vs, RID p_canvas_item, Rect2i rect, PoolIntArray corner_radius, Color color, int border_width, PoolColorArray b_col, bool blend_border) {
+
+	if (blend_border) {
 		for (int i = 0; i < border_width; i++) {
 			float factor = 1.0 - (float(i) / float(border_width));
 			PoolColorArray interp_color_array;
@@ -539,10 +539,12 @@ inline void draw_rounded_rect_bordered(VisualServer *vs, RID p_canvas_item, Rect
 			PoolColorArray::Read color_r = interp_color_array.read();
 			Rect2i inner_rect = rect.grow(-i);
 			if (color.a == 0 || (inner_rect.size.width > 0 && inner_rect.size.height > 0)) {
-				draw_rounded_rect(vs, p_canvas_item, inner_rect, get_offset_corner_radius(i, corner_radius), color_r[MARGIN_TOP], color_r[MARGIN_BOTTOM], color_r[MARGIN_LEFT], color_r[MARGIN_RIGHT], border_width, true);
+				draw_rounded_rect(vs, p_canvas_item, inner_rect, get_offset_corner_radius(i, corner_radius), color_r[MARGIN_TOP], color_r[MARGIN_BOTTOM], color_r[MARGIN_LEFT], color_r[MARGIN_RIGHT], border_width, false);
 			} else
 				break;
 		}
+	} else {
+		draw_rounded_rect(vs, p_canvas_item, rect, get_offset_corner_radius(0, corner_radius), b_col[MARGIN_TOP], b_col[MARGIN_BOTTOM], b_col[MARGIN_LEFT], b_col[MARGIN_RIGHT], border_width, false);
 	}
 	Rect2 inner_rect = rect.grow(-border_width);
 	if (inner_rect.size.width > 0 && inner_rect.size.height > 0) {
@@ -553,8 +555,12 @@ void StyleBoxFlat::draw(RID p_canvas_item, const Rect2 &p_rect) const {
 
 	VisualServer *vs = VisualServer::get_singleton();
 	Rect2i r = p_rect;
-
-	draw_rounded_rect_bordered(vs, p_canvas_item, r, corner_radius, bg_color, border_size, border_color, blend);
+	PoolIntArray cr;
+	cr.append(corner_radius[0]);
+	cr.append(corner_radius[1]);
+	cr.append(corner_radius[2]);
+	cr.append(corner_radius[3]);
+	draw_rounded_rect_bordered(vs, p_canvas_item, r, cr, bg_color, border_size, border_color, blend);
 
 	//draw additional borders
 	Rect2i r_add = p_rect;
