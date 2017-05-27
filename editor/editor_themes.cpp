@@ -127,8 +127,12 @@ Ref<Theme> create_editor_theme() {
 	// Focus
 	Ref<StyleBoxFlat> focus_sbt = make_flat_stylebox(light_color_1, 4, 4, 4, 4);
 	focus_sbt->set_draw_center(false);
-	focus_sbt->set_border_size(1 * EDSCALE);
-	focus_sbt = change_border_color(focus_sbt, light_color_2);
+	focus_sbt->set_border_size(1);
+	Color light_color_2_transparent = light_color_2;
+	Color dark_color_1_transparent = light_color_1;
+	light_color_2_transparent.a = 0.2;
+	dark_color_1_transparent.a = 0.3;
+	focus_sbt->set_all_border_color(dark_color_1_transparent);
 	theme->set_stylebox("Focus", "EditorStyles", focus_sbt);
 
 	// Menu
@@ -205,7 +209,7 @@ Ref<Theme> create_editor_theme() {
 	theme->set_icon("arrow", "OptionButton", theme->get_icon("OptionArrow", "EditorIcons"));
 
 	// PopupMenu
-	Ref<StyleBoxFlat> style_popup_menu = make_flat_stylebox(dark_color_1, 0, 8, 0, 0);
+	Ref<StyleBoxFlat> style_popup_menu = make_flat_stylebox(dark_color_1, 8, 8, 8, 8);
 	style_popup_menu->set_border_size(2 * EDSCALE);
 	style_popup_menu->set_light_color(light_color_1);
 	style_popup_menu->set_dark_color(light_color_1);
@@ -267,9 +271,11 @@ Ref<Theme> create_editor_theme() {
 
 	Ref<StyleBoxFlat> style_tab_fg = make_flat_stylebox(base_color, 15, 5, 15, 5);
 	style_tab_fg->set_corner_radius(15, 15, 0, 0);
+	Ref<StyleBoxFlat> style_tab_bg = make_flat_stylebox(base_color, 15, 5, 15, 5);
 	style_tab_bg->set_draw_center(false);
-	style_tab_bg->set_border_size(1 * EDSCALE);
-	style_tab_bg->set_border_color(HIGHLIGHT_COLOR_DARK);
+	style_tab_bg->set_border_size(1);
+	style_tab_bg->set_corner_radius(15, 15, 0, 0);
+	style_tab_bg->set_all_border_color(HIGHLIGHT_COLOR_DARK);
 	style_tab_bg->set_border_color(Color(0, 0, 0, 0), MARGIN_BOTTOM);
 
 	// Tabs & TabContainer
@@ -297,12 +303,13 @@ Ref<Theme> create_editor_theme() {
 	Ref<StyleBoxFlat> style_lineedit = make_flat_stylebox(dark_color_1, 4, 4, 4, 4);
 	style_lineedit->set_border_size(1 * EDSCALE);
 	style_lineedit = change_border_color(style_lineedit, light_color_1);
-	style_lineedit->set_all_corner_radius(100);
+	style_lineedit->set_all_corner_radius(40);
 	Ref<StyleBoxFlat> style_lineedit_disabled = style_lineedit->duplicate();
 	style_lineedit_disabled->set_bg_color(light_color_1);
-	style_lineedit_disabled->set_all_corner_radius(100);
+	style_lineedit_disabled->set_all_corner_radius(40);
 	Ref<StyleBoxFlat> style_lineedit_focus = change_border_color(style_lineedit, highlight_color);
 	style_lineedit_focus->set_draw_center(false);
+	style_lineedit_disabled->set_all_corner_radius(40);
 	theme->set_stylebox("normal", "LineEdit", style_lineedit);
 	theme->set_stylebox("focus", "LineEdit", style_lineedit_focus);
 	theme->set_stylebox("read_only", "LineEdit", style_lineedit_disabled);
@@ -331,13 +338,13 @@ Ref<Theme> create_editor_theme() {
 	// WindowDialog
 	Ref<StyleBoxFlat> style_window = make_flat_stylebox(dark_color_2, 0, 0, 0, 0);
 	style_window->set_border_blend(false);
-	style_window->set_border_size(1 * EDSCALE);
-	style_window->set_all_border_color(light_color_2);
-	style_window->set_border_color_bottom(dark_color_3);
-	style_window->set_border_color_left(dark_color_3);
-	style_window->set_border_color_right(dark_color_3);
-	style_window->set_corner_radius(0, 0, 15, 15);
+	style_window->set_border_size(2);
+	style_window->set_border_color_top(light_color_2_transparent);
+	style_window->set_all_border_color(dark_color_1);
+	style_window->set_corner_radius(0, 0, 30, 30);
+
 	style_window->_set_additional_border_size(MARGIN_TOP, 24 * EDSCALE);
+	theme->set_color("title_color", "WindowDialog", Color(1, 1, 2));
 	theme->set_stylebox("panel", "WindowDialog", style_window);
 
 	// HScrollBar
