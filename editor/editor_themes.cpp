@@ -174,11 +174,11 @@ Ref<Theme> create_editor_theme() {
 	theme->set_stylebox("Content", "EditorStyles", style_panel);
 
 	// Button
-	Ref<StyleBoxFlat> style_button = make_flat_stylebox(dark_color_1, 4, 4, 4, 4);
+	Ref<StyleBoxFlat> style_button = make_flat_stylebox(dark_color_1, 20, 4, 20, 4);
 	style_button->set_draw_center(true);
 	style_button->set_border_size(2 * EDSCALE);
-	style_button->set_light_color(light_color_1);
-	style_button->set_dark_color(light_color_1);
+	style_button->set_all_border_color(light_color_1);
+	style_button->set_all_corner_radius(30);
 	style_button->set_border_blend(false);
 	theme->set_stylebox("normal", "Button", style_button);
 	theme->set_stylebox("hover", "Button", style_button);
@@ -205,7 +205,7 @@ Ref<Theme> create_editor_theme() {
 	theme->set_icon("arrow", "OptionButton", theme->get_icon("OptionArrow", "EditorIcons"));
 
 	// PopupMenu
-	Ref<StyleBoxFlat> style_popup_menu = make_flat_stylebox(dark_color_1, 8, 8, 8, 8);
+	Ref<StyleBoxFlat> style_popup_menu = make_flat_stylebox(dark_color_1, 0, 8, 0, 0);
 	style_popup_menu->set_border_size(2 * EDSCALE);
 	style_popup_menu->set_light_color(light_color_1);
 	style_popup_menu->set_dark_color(light_color_1);
@@ -266,6 +266,7 @@ Ref<Theme> create_editor_theme() {
 	theme->set_stylebox("bg", "ItemList", style_bg);
 
 	Ref<StyleBoxFlat> style_tab_fg = make_flat_stylebox(base_color, 15, 5, 15, 5);
+	style_tab_fg->set_corner_radius(15, 15, 0, 0);
 	Ref<StyleBoxFlat> style_tab_bg = make_flat_stylebox(base_color, 15, 5, 15, 5);
 	style_tab_bg->set_draw_center(false);
 
@@ -324,11 +325,14 @@ Ref<Theme> create_editor_theme() {
 	theme->set_constant("separation", "VSplitContainer", 8 * EDSCALE);
 
 	// WindowDialog
-	Ref<StyleBoxFlat> style_window = make_flat_stylebox(dark_color_2, 4, 4, 4, 4);
-	style_window->set_border_size(2 * EDSCALE);
+	Ref<StyleBoxFlat> style_window = make_flat_stylebox(dark_color_2, 0, 0, 0, 0);
 	style_window->set_border_blend(false);
-	style_window->set_light_color(light_color_2);
-	style_window->set_dark_color(light_color_2);
+	style_window->set_border_size(1 * EDSCALE);
+	style_window->set_all_border_color(light_color_2);
+	style_window->set_border_color_bottom(dark_color_3);
+	style_window->set_border_color_left(dark_color_3);
+	style_window->set_border_color_right(dark_color_3);
+	style_window->set_corner_radius(0, 0, 15, 15);
 	style_window->_set_additional_border_size(MARGIN_TOP, 24 * EDSCALE);
 	theme->set_stylebox("panel", "WindowDialog", style_window);
 
@@ -376,9 +380,8 @@ Ref<Theme> create_editor_theme() {
 
 	// PopupPanel
 	Ref<StyleBoxFlat> style_dock_select = make_flat_stylebox(base_color);
-	style_dock_select->set_light_color(light_color_1);
-	style_dock_select->set_dark_color(light_color_1);
-	style_dock_select = add_additional_border(style_dock_select, 2, 2, 2, 2);
+	style_dock_select->set_all_border_color(light_color_1);
+	style_dock_select = add_additional_border(style_dock_select, 0, 2, 0, 0);
 	theme->set_stylebox("panel", "PopupPanel", style_dock_select);
 
 	// SpinBox
