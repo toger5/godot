@@ -279,11 +279,10 @@ void StyleBoxFlat::set_light_color(const Color &p_color) {
 
 	set_border_color(p_color, MARGIN_LEFT);
 	set_border_color(p_color, MARGIN_TOP);
+	set_border_color(p_color, MARGIN_RIGHT);
 	emit_changed();
 }
 void StyleBoxFlat::set_dark_color(const Color &p_color) {
-
-	set_border_color(p_color, MARGIN_RIGHT);
 	set_border_color(p_color, MARGIN_BOTTOM);
 	emit_changed();
 }
@@ -305,7 +304,6 @@ Color StyleBoxFlat::get_dark_color() const {
 }
 
 void StyleBoxFlat::set_border_size(int p_size) {
-
 	border_size = p_size;
 	emit_changed();
 }
@@ -482,11 +480,14 @@ inline void draw_rounded_rect(VisualServer *vs, RID p_canvas_item, Rect2 rect, P
 	//draw corners
 	for (int i = 0; i < 4; i++) {
 
-		Color col = col_top;
 		float rad = (float)corner_radius[i];
+
+		if (rad == 0) {
+			continue;
+		}
+		Color col = col_top;
 		if (i > 1)
 			col = col_bottom;
-
 		if (filled) {
 			vs->canvas_item_add_circle(p_canvas_item, corners[i], rad, col);
 		} else {
@@ -530,7 +531,11 @@ inline PoolIntArray get_offset_corner_radius(int offset, PoolIntArray corner_rad
 inline void draw_rounded_rect_bordered(VisualServer *vs, RID p_canvas_item, Rect2i rect, PoolIntArray corner_radius, Color color, int border_width, PoolColorArray b_col, bool blend_border) {
 
 	if (blend_border && border_width > 0) {
-		for (int i = 0; i < border_width; i++) {
+		int step = 1;
+		if (border_width > 15) {
+			step = border_width / 15;
+		}
+		for (int i = 0; i < border_width; i += step) {
 			float factor = 1.0 - (float(i) / float(border_width));
 			PoolColorArray interp_color_array;
 			for (int j = 0; j < 4; j++) {
@@ -561,7 +566,15 @@ void StyleBoxFlat::draw(RID p_canvas_item, const Rect2 &p_rect) const {
 	cr.append(corner_radius[1]);
 	cr.append(corner_radius[2]);
 	cr.append(corner_radius[3]);
-	draw_rounded_rect_bordered(vs, p_canvas_item, r, cr, bg_color, border_size, border_color, blend);
+
+	int adapted_border = border_size;
+	if (adapted_border > r.size.width) {
+		adapted_border = r.size.width;
+	}
+	if (adapted_border > r.size.height) {
+		adapted_border = r.size.height;
+	}
+	draw_rounded_rect_bordered(vs, p_canvas_item, r, cr, bg_color, adapted_border, border_color, blend);
 
 	//draw additional borders
 	Rect2i r_add = p_rect;
