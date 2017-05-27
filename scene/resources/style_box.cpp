@@ -513,7 +513,7 @@ inline void draw_rounded_rect(VisualServer *vs, RID p_canvas_item, Rect2 rect, P
 
 	vs->canvas_item_add_rect(p_canvas_item, rect_top, col_top);
 	vs->canvas_item_add_rect(p_canvas_item, rect_left, col_left);
-	vs->canvas_item_add_rect(p_canvas_item, rect_right, Color(1, 0, 0, 0.5));
+	vs->canvas_item_add_rect(p_canvas_item, rect_right, col_right);
 	//has to be drawn last
 	vs->canvas_item_add_rect(p_canvas_item, rect_bottom, col_bottom);
 }
