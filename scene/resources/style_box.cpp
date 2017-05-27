@@ -272,7 +272,7 @@ void StyleBoxFlat::set_border_color(const Color &p_color, const Margin &p_border
 	emit_changed();
 }
 void StyleBoxFlat::set_all_border_color(const Color &p_color) {
-	for (int i; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 
 		border_color.write()[i] = p_color;
 	}
