@@ -322,8 +322,9 @@ Ref<Theme> create_editor_theme(const Ref<Theme> p_theme) {
 	style_default->set_draw_center(true);
 
 	// Button and widgets
+	const float extra_spacing = EDITOR_DEF("interface/theme/additional_spacing", 0.0);
+
 	Ref<StyleBoxFlat> style_widget = style_default->duplicate();
-	const int extra_spacing = 3;
 	style_widget->set_default_margin(MARGIN_LEFT, (extra_spacing + default_margin_size) * EDSCALE);
 	style_widget->set_default_margin(MARGIN_TOP, (extra_spacing + default_margin_size) * EDSCALE);
 	style_widget->set_default_margin(MARGIN_RIGHT, (extra_spacing + default_margin_size) * EDSCALE);
