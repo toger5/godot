@@ -419,7 +419,7 @@ Ref<Theme> create_editor_theme(const Ref<Theme> p_theme) {
 	style_popup->set_default_margin(MARGIN_BOTTOM, default_margin_size * EDSCALE * 2);
 	style_popup->set_border_color_all(contrast_color_1);
 	style_popup->set_border_width_all(MAX(EDSCALE, border_width));
-	const Color shadow_color = Color(0, 0, 0, dark_theme ? 0.3 : 0.1);
+	const Color shadow_color = Color(0, 0, 0, dark_theme ? 0.2 : 0.075);
 	style_popup->set_shadow_color(shadow_color);
 	style_popup->set_shadow_size(4 * EDSCALE);
 
