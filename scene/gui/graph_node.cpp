@@ -152,7 +152,7 @@ void GraphNode::_resort() {
 
 		Size2i size = c->get_combined_minimum_size();
 
-		Rect2 r(sb->get_margin(MARGIN_LEFT), sb->get_margin(MARGIN_TOP) + vofs, w, size.y);
+		Rect2 r(sb->get_margin(MARGIN_LEFT), get_header_height() + vofs, w, size.y);
 
 		fit_child_in_rect(c, r);
 		cache_y.push_back(vofs + size.y * 0.5);
@@ -192,33 +192,32 @@ void GraphNode::_notification(int p_what) {
 
 	if (p_what == NOTIFICATION_DRAW) {
 
-		Ref<StyleBox> sb;
+		Ref<StyleBox> sb_frame;
+		Ref<StyleBox> sb_header;
 
 		if (comment) {
-			sb = get_stylebox(selected ? "commentfocus" : "comment");
-
+			sb_frame = get_stylebox(selected ? "commentfocus" : "comment");
+			sb_header = get_stylebox(selected ? "commentfocus_header" : "comment_header");
 		} else {
-
-			sb = get_stylebox(selected ? "selectedframe" : "frame");
+			sb_frame = get_stylebox(selected ? "selectedframe" : "frame");
+			sb_header = get_stylebox(selected ? "selectedframe_header" : "frame_header");
 		}
 
-		//sb=sb->duplicate();
-		//sb->call("set_modulate",modulate);
 		Ref<Texture> port = get_icon("port");
 		Ref<Texture> close = get_icon("close");
 		Ref<Texture> resizer = get_icon("resizer");
-		int close_offset = get_constant("close_offset");
 		int close_h_offset = get_constant("close_h_offset");
 		Color close_color = get_color("close_color");
 		Ref<Font> title_font = get_font("title_font");
-		int title_offset = get_constant("title_offset");
-		int title_h_offset = get_constant("title_h_offset");
 		Color title_color = get_color("title_color");
+
+		int title_height = sb_header->get_minimum_size().height + title_font->get_height();
 		Point2i icofs = -port->get_size() * 0.5;
 		int edgeofs = get_constant("port_offset");
-		icofs.y += sb->get_margin(MARGIN_TOP);
+		icofs.y += get_header_height();
 
-		draw_style_box(sb, Rect2(Point2(), get_size()));
+		draw_style_box(sb_frame, Rect2(Point2(0, title_height), get_size() - Size2(0, title_height)));
+		draw_style_box(sb_header, Rect2(Point2(), Size2(get_size().width, title_height)));
 
 		switch (overlay) {
 			case OVERLAY_DISABLED: {
@@ -234,14 +233,14 @@ void GraphNode::_notification(int p_what) {
 			} break;
 		}
 
-		int w = get_size().width - sb->get_minimum_size().x;
+		int w = get_size().width - sb_header->get_minimum_size().x;
 
 		if (show_close)
 			w -= close->get_width();
 
-		draw_string(title_font, Point2(sb->get_margin(MARGIN_LEFT) + title_h_offset, -title_font->get_height() + title_font->get_ascent() + title_offset), title, title_color, w);
+		draw_string(title_font, Point2(sb_header->get_margin(MARGIN_LEFT), title_font->get_ascent() + sb_header->get_margin(MARGIN_TOP)), title, title_color, w);
 		if (show_close) {
-			Vector2 cpos = Point2(w + sb->get_margin(MARGIN_LEFT) + close_h_offset, -close->get_height() + close_offset);
+			Vector2 cpos = Point2(get_size().width - close->get_width() - close_h_offset, (title_height - close->get_height()) / 2);
 			draw_texture(close, cpos, close_color);
 			close_rect.position = cpos;
 			close_rect.size = close->get_size();
@@ -360,13 +359,16 @@ Color GraphNode::get_slot_color_right(int p_idx) const {
 		return Color(1, 1, 1, 1);
 	return slot_info[p_idx].color_right;
 }
-
+int GraphNode::get_header_height() const {
+	return get_stylebox("frame_header")->get_minimum_size().height + get_font("title_font")->get_height() + get_stylebox("frame")->get_margin(MARGIN_TOP);
+}
 Size2 GraphNode::get_minimum_size() const {
 
 	Ref<Font> title_font = get_font("title_font");
 
 	int sep = get_constant("separation");
-	Ref<StyleBox> sb = get_stylebox("frame");
+	Ref<StyleBox> sb_frame = get_stylebox("frame");
+	Ref<StyleBox> sb_header = get_stylebox("frame_header");
 	bool first = true;
 
 	Size2 minsize;
@@ -394,8 +396,9 @@ Size2 GraphNode::get_minimum_size() const {
 		else
 			minsize.y += sep;
 	}
-
-	return minsize + sb->get_minimum_size();
+	Size2 header_min_size = sb_header->get_minimum_size();
+	Size2 frame_min_size = sb_frame->get_minimum_size();
+	return minsize + Size2(MAX(frame_min_size.x, header_min_size.x), frame_min_size.y + header_min_size.y + title_font->get_height());
 }
 
 void GraphNode::set_title(const String &p_title) {
@@ -457,7 +460,7 @@ void GraphNode::_connpos_update() {
 	int edgeofs = get_constant("port_offset");
 	int sep = get_constant("separation");
 
-	Ref<StyleBox> sb = get_stylebox("frame");
+	// Ref<StyleBox> sb = get_stylebox("frame");
 	conn_input_cache.clear();
 	conn_output_cache.clear();
 	int vofs = 0;
@@ -473,7 +476,7 @@ void GraphNode::_connpos_update() {
 
 		Size2i size = c->get_combined_minimum_size();
 
-		int y = sb->get_margin(MARGIN_TOP) + vofs;
+		int y = get_header_height() + vofs;
 		int h = size.y;
 
 		if (slot_info.has(idx)) {

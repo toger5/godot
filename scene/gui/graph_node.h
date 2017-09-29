@@ -154,6 +154,7 @@ public:
 	void set_resizable(bool p_enable);
 	bool is_resizable() const;
 
+	int get_header_height() const;
 	virtual Size2 get_minimum_size() const;
 
 	bool is_resizing() const { return resizing; }

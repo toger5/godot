@@ -865,42 +865,72 @@ Ref<Theme> create_editor_theme(const Ref<Theme> p_theme) {
 	// GraphNode
 
 	const int gn_margin_side = 28;
-	Ref<StyleBoxFlat> graphsb = make_flat_stylebox(Color(0, 0, 0, 0.3), gn_margin_side, 24, gn_margin_side, 5);
+	const Color graph_bg_color = Color(0, 0, 0);
+	const Color graph_header_bg_color = Color(0.3, 0.3, 0.3);
+	Ref<StyleBoxFlat> graphsb = make_flat_stylebox(graph_bg_color * Color(1, 1, 1, 0.3), gn_margin_side, 5, gn_margin_side, 5);
 	graphsb->set_border_width_all(border_width);
+	graphsb->set_border_width(MARGIN_TOP, 0);
 	graphsb->set_border_color_all(Color(1, 1, 1, 0.9));
-	Ref<StyleBoxFlat> graphsbselected = make_flat_stylebox(Color(0, 0, 0, 0.4), gn_margin_side, 24, gn_margin_side, 5);
-	graphsbselected->set_border_width_all(border_width);
+	Ref<StyleBoxFlat> graphsbselected = graphsb->duplicate();
+	graphsbselected->set_bg_color(graph_bg_color * Color(1, 1, 1, 0.4));
 	graphsbselected->set_border_color_all(Color(accent_color.r, accent_color.g, accent_color.b, 0.9));
-	graphsbselected->set_shadow_size(8 * EDSCALE);
+	graphsbselected->set_shadow_size(12 * EDSCALE);
 	graphsbselected->set_shadow_color(shadow_color);
-	Ref<StyleBoxFlat> graphsbcomment = make_flat_stylebox(Color(0, 0, 0, 0.3), gn_margin_side, 24, gn_margin_side, 5);
-	graphsbcomment->set_border_width_all(border_width);
-	graphsbcomment->set_border_color_all(Color(1, 1, 1, 0.9));
-	Ref<StyleBoxFlat> graphsbcommentselected = make_flat_stylebox(Color(0, 0, 0, 0.4), gn_margin_side, 24, gn_margin_side, 5);
-	graphsbcommentselected->set_border_width_all(border_width);
-	graphsbcommentselected->set_border_color_all(Color(1, 1, 1, 0.9));
+	Ref<StyleBoxFlat> graphsbcomment = graphsb->duplicate();
+	graphsbcomment->set_bg_color(graph_bg_color * Color(1, 1, 1, 0.3));
+	Ref<StyleBoxFlat> graphsbcommentselected = graphsb->duplicate();
+	graphsbcommentselected->set_bg_color(graph_bg_color * Color(1, 1, 1, 0.4));
+
+	Ref<StyleBoxFlat> graphsbheader = make_flat_stylebox(graph_bg_color * Color(1, 1, 1, 0.3), gn_margin_side, 5, gn_margin_side, 5);
+	graphsbheader->set_border_width_all(border_width);
+	graphsbheader->set_border_width(MARGIN_BOTTOM, 0);
+	graphsbheader->set_border_color_all(Color(1, 1, 1, 0.9));
+
+	Ref<StyleBoxFlat> graphsbheaderselected = graphsbheader->duplicate();
+	graphsbheaderselected->set_border_color_all(Color(accent_color.r, accent_color.g, accent_color.b, 0.9));
 
 	if (use_gn_headers) {
-		graphsb->set_border_width(MARGIN_TOP, 24 * EDSCALE);
-		graphsbselected->set_border_width(MARGIN_TOP, 24 * EDSCALE);
-		graphsbcomment->set_border_width(MARGIN_TOP, 24 * EDSCALE);
-		graphsbcommentselected->set_border_width(MARGIN_TOP, 24 * EDSCALE);
+		// graphsb->set_border_width(MARGIN_TOP, 24 * EDSCALE);
+		// graphsbselected->set_border_width(MARGIN_TOP, 24 * EDSCALE);
+		// graphsbcomment->set_border_width(MARGIN_TOP, 24 * EDSCALE);
+		// graphsbcommentselected->set_border_width(MARGIN_TOP, 24 * EDSCALE);
+		graphsbheader->set_bg_color(Color(1, 1, 1, 0.9));
 	}
+
+	theme->set_stylebox("frame_header", "GraphNode", graphsbheader);
+	theme->set_stylebox("selectedframe_header", "GraphNode", graphsbheaderselected);
+	theme->set_stylebox("comment_header", "GraphNode", graphsbheader);
+	theme->set_stylebox("commentfocus_header", "GraphNode", graphsbheaderselected);
 
 	theme->set_stylebox("frame", "GraphNode", graphsb);
 	theme->set_stylebox("selectedframe", "GraphNode", graphsbselected);
 	theme->set_stylebox("comment", "GraphNode", graphsbcomment);
 	theme->set_stylebox("commentfocus", "GraphNode", graphsbcommentselected);
-	theme->set_constant("port_offset", "GraphNode", 14 * EDSCALE);
-	theme->set_constant("title_h_offset", "GraphNode", -16 * EDSCALE);
-	theme->set_constant("close_h_offset", "GraphNode", 20 * EDSCALE);
-	theme->set_constant("close_offset", "GraphNode", 20 * EDSCALE);
+
+	theme->set_constant("port_offset", "GraphNode", 10 * EDSCALE);
+	// theme->set_constant("title_h_offset", "GraphNode", graphsb->get_margin(MARGIN_LEFT));
+	theme->set_constant("close_h_offset", "GraphNode", 5);
+
 	theme->set_icon("close", "GraphNode", theme->get_icon("GuiCloseCustomizable", "EditorIcons"));
 	theme->set_icon("resizer", "GraphNode", theme->get_icon("GuiResizer", "EditorIcons"));
 	theme->set_icon("port", "GraphNode", theme->get_icon("GuiGraphNodePort", "EditorIcons"));
 
 	// GridContainer
 	theme->set_constant("vseperation", "GridContainer", (extra_spacing + default_margin_size) * EDSCALE);
+
+	// for the new graph node style
+	// graphsbcommentselected->set_border_width(MARGIN_TOP, 22 * EDSCALE + border_width);
+	// theme->set_stylebox("frame", "GraphNode", style_widget);
+	// theme->set_stylebox("selectedframe", "GraphNode", graphsbselected);
+	// theme->set_stylebox("comment", "GraphNode", style_widget);
+	// theme->set_stylebox("commentfocus", "GraphNode", style_widget);
+
+	// Ref<StyleBoxFlat> style_highlight_widget = style_widget->duplicate();
+	// style_highlight_widget->set_bg_color(Color(1, 0, 0));
+	// theme->set_stylebox("frame_header", "GraphNode", style_highlight_widget);
+	// theme->set_stylebox("selectedframe_header", "GraphNode", style_highlight_widget);
+	// theme->set_stylebox("comment_header", "GraphNode", style_highlight_widget);
+	// theme->set_stylebox("commentfocus_header", "GraphNode", style_highlight_widget);
 
 	// FileDialog
 	theme->set_color("files_disabled", "FileDialog", font_color_disabled);
