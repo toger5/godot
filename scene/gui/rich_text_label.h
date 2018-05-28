@@ -353,6 +353,9 @@ public:
 	Error parse_bbcode(const String &p_bbcode);
 	Error append_bbcode(const String &p_bbcode);
 
+	// Error parse_markdown(const String &p_markdown);
+	Error append_markdown(const String &p_markdown);
+
 	void set_use_bbcode(bool p_enable);
 	bool is_using_bbcode() const;
 

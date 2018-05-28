@@ -29,6 +29,7 @@
 /*************************************************************************/
 
 #include "rich_text_label.h"
+#include "modules/regex/regex.h"
 #include "os/keyboard.h"
 #include "os/os.h"
 #include "scene/scene_string_names.h"
@@ -1638,7 +1639,39 @@ Error RichTextLabel::parse_bbcode(const String &p_bbcode) {
 	clear();
 	return append_bbcode(p_bbcode);
 }
+// Error RichTextLabel::parse_markdown(const String &p_markdown) {
+// 	clear();
+// 	return append_markdown(p_markdonw);
+// }
+Error RichTextLabel::append_markdown(const String &p_markdown) {
+	String text = String(p_markdown);
+	RegEx regex;
+	//Bold
+	regex.compile("(\\*\\*|__)(.*?)(\\1)");
+	text = regex.sub(text, "[b]$2[\\b]", true);
+	//header
+	regex.compile("(#+ )(.*)");
+	text = regex.sub(text, "[font='res://headline_font.otf']$2[/font]", true);
+	// sub("(#+ )(.*)", "[font='res://headline_font.otf']$2[/font]");
+	//italic
+	regex.compile("(\\*|_)(.*?)\\1");
+	text = regex.sub(text, "[i]$2[/i]", true);
+	// sub("(\\*|_)(.*?)\\1", "[i]$2[/i]");
+	//code
+	regex.compile("'''(.*?)'''");
+	text = regex.sub(text, "[code]$1[/code]", true);
+	// sub("'''(.*?)'''", "[code]$1[/code]");
+	//code alt
+	regex.compile("`(.*?)`");
+	text = regex.sub(text, "[code]$1[/code]", true);
+	// sub("`(.*?)`", "[code]$1[/code]");
+	//url
+	regex.compile("\\[([^\\[]+)\\]\\(([^\\)]+)\\)");
+	text = regex.sub(text, "[url=$2]$1[/url]", true);
+	// sub("\\[([^\\[]+)\\]\\(([^\\)]+)\\)", "[url=$2]$1[/url]");
 
+	return append_bbcode(text);
+}
 Error RichTextLabel::append_bbcode(const String &p_bbcode) {
 
 	int pos = 0;
@@ -2163,6 +2196,9 @@ void RichTextLabel::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("parse_bbcode", "bbcode"), &RichTextLabel::parse_bbcode);
 	ClassDB::bind_method(D_METHOD("append_bbcode", "bbcode"), &RichTextLabel::append_bbcode);
+
+	// ClassDB::bind_method(D_METHOD("parse_markdown", "markdown"), &RichTextLabel::parse_markdown);
+	ClassDB::bind_method(D_METHOD("append_markdown", "markdown"), &RichTextLabel::append_markdown);
 
 	ClassDB::bind_method(D_METHOD("set_bbcode", "text"), &RichTextLabel::set_bbcode);
 	ClassDB::bind_method(D_METHOD("get_bbcode"), &RichTextLabel::get_bbcode);

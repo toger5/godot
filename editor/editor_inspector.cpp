@@ -842,6 +842,7 @@ void EditorInspectorPlugin::_bind_methods() {
 
 	MethodInfo vm;
 	vm.name = "can_handle";
+	vm.return_val.type = Variant::BOOL;
 	vm.arguments.push_back(PropertyInfo(Variant::OBJECT, "object"));
 	BIND_VMETHOD(vm);
 	vm.name = "parse_begin";

@@ -1742,7 +1742,6 @@ bool ScriptEditor::edit(const Ref<Script> &p_script, int p_line, int p_col, bool
 		ScriptEditorBase *se = Object::cast_to<ScriptEditorBase>(tab_container->get_child(i));
 		if (!se)
 			continue;
-
 		if (se->get_edited_script() == p_script) {
 
 			if (should_open) {
@@ -1766,6 +1765,7 @@ bool ScriptEditor::edit(const Ref<Script> &p_script, int p_line, int p_col, bool
 
 	for (int i = script_editor_func_count - 1; i >= 0; i--) {
 		se = script_editor_funcs[i](p_script);
+		//here would the RawTextEditor get loaded p_script woudl need to be a recource
 		if (se)
 			break;
 	}
@@ -2339,7 +2339,9 @@ void ScriptEditor::_help_class_open(const String &p_class) {
 	_update_script_names();
 	_save_layout();
 }
+//TODO: i need to add a markdown fiel open
 
+//TODO: or i need a rawTextFile open function
 void ScriptEditor::_help_class_goto(const String &p_desc) {
 
 	String cname = p_desc.get_slice(":", 1);
@@ -2935,7 +2937,7 @@ void ScriptEditorPlugin::edit(Object *p_object) {
 
 	if (!Object::cast_to<Script>(p_object))
 		return;
-
+	//TODO: need to add a show function using the docs page
 	script_editor->edit(Object::cast_to<Script>(p_object));
 }
 
@@ -2950,7 +2952,7 @@ bool ScriptEditorPlugin::handles(Object *p_object) const {
 		}
 		return valid;
 	}
-
+	//here i need to add the code that the editor can handle text files + md files
 	return p_object->is_class("Script");
 }
 
