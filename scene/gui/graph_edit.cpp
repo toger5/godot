@@ -975,8 +975,8 @@ void GraphEdit::_gui_input(const Ref<InputEvent> &p_ev) {
 	Ref<InputEventPanGesture> pan_gesture = p_ev;
 	if (pan_gesture.is_valid()) {
 
-		h_scroll->set_value(h_scroll->get_value() + h_scroll->get_page() * pan_gesture->get_delta().x / 8);
-		v_scroll->set_value(v_scroll->get_value() + v_scroll->get_page() * pan_gesture->get_delta().y / 8);
+		h_scroll->set_value(h_scroll->get_value() + h_scroll->get_page() * pan_gesture->get_relative().x / 8);
+		v_scroll->set_value(v_scroll->get_value() + v_scroll->get_page() * pan_gesture->get_relative().y / 8);
 	}
 }
 

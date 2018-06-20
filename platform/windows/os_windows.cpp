@@ -425,12 +425,12 @@ LRESULT OS_Windows::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 				old_y = c.y;
 
 				if (mm->get_position() == c) {
-					center = c;
+					_center = c;
 					return 0;
 				}
 
 				Point2i ncenter = mm->get_position();
-				center = ncenter;
+				_center = ncenter;
 				POINT pos = { (int)c.x, (int)c.y };
 				ClientToScreen(hWnd, &pos);
 				SetCursorPos(pos.x, pos.y);
@@ -465,7 +465,8 @@ LRESULT OS_Windows::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		case WM_MBUTTONDBLCLK:
 		case WM_RBUTTONDBLCLK:
 			/*case WM_XBUTTONDOWN:
-		case WM_XBUTTONUP: */ {
+		case WM_XBUTTONUP: */
+			{
 
 				if (input->is_emulating_mouse_from_touch()) {
 					// Universal translation enabled; ignore OS translation
@@ -528,12 +529,13 @@ LRESULT OS_Windows::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 						int motion = (short)HIWORD(wParam);
 						if (!motion)
 							return 0;
-
-						if (motion > 0)
+						if (motion < 0) {
 							mb->set_button_index(BUTTON_WHEEL_UP);
-						else
+							mb->set_factor(fabs((double)motion / (double)WHEEL_DELTA));
+						} else {
 							mb->set_button_index(BUTTON_WHEEL_DOWN);
-
+							mb->set_factor(fabs((double)motion / (double)WHEEL_DELTA));
+						}
 					} break;
 					case WM_MOUSEHWHEEL: {
 
@@ -619,6 +621,67 @@ LRESULT OS_Windows::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 				}
 			}
 			break;
+		case WM_GESTURE: {
+			// Create a structure to populate and retrieve the extra message info.
+			GESTUREINFO gi;
+
+			ZeroMemory(&gi, sizeof(GESTUREINFO));
+
+			gi.cbSize = sizeof(GESTUREINFO);
+
+			BOOL bResult = GetGestureInfo((HGESTUREINFO)lParam, &gi);
+			BOOL bHandled = false;
+
+			if (bResult) {
+				// now interpret the gesture
+
+				switch (gi.dwID) {
+					case GID_ZOOM: {
+						if (gi.dwFlags & GF_BEGIN) {
+							_last_pan.x = gi.ptsLocation.x;
+							_last_pan.y = gi.ptsLocation.y;
+							_last_zoom = gi.ullArguments;
+						} else {
+							Ref<InputEventMagnifyGesture> gm;
+							gm.instance();
+
+							gm->set_control((wParam & MK_CONTROL) != 0);
+							gm->set_shift((wParam & MK_SHIFT) != 0);
+							gm->set_alt(alt_mem);
+							gm->set_factor(_last_zoom / gi.ullArguments);
+							gm->set_relative(Vector2(gi.ptsLocation.x - _last_pan.x, gi.ptsLocation.y - _last_pan.y));
+							input->parse_input_event(gm);
+						}
+						bHandled = true;
+					} break;
+					case GID_PAN: {
+						if (gi.dwFlags & GF_BEGIN) {
+							_last_pan.x = gi.ptsLocation.x;
+							_last_pan.y = gi.ptsLocation.y;
+						} else {
+							Ref<InputEventMagnifyGesture> gp;
+							gp.instance();
+
+							gp->set_control((wParam & MK_CONTROL) != 0);
+							gp->set_shift((wParam & MK_SHIFT) != 0);
+							gp->set_alt(alt_mem);
+							gp->set_relative(Vector2(gi.ptsLocation.x - _last_pan.x, gi.ptsLocation.y - _last_pan.y));
+							input->parse_input_event(gp);
+						}
+						bHandled = TRUE;
+					} break;
+					default:
+						break;
+				}
+			} else {
+				DWORD dwErr = GetLastError();
+				if (dwErr > 0) {
+					//TODO: print error
+				}
+			}
+			if (bHandled)
+				return 0;
+		} break;
 
 		case WM_SIZE: {
 			int window_w = LOWORD(lParam);
@@ -1332,8 +1395,8 @@ void OS_Windows::set_mouse_mode(MouseMode p_mode) {
 		ClientToScreen(hWnd, (POINT *)&clipRect.left);
 		ClientToScreen(hWnd, (POINT *)&clipRect.right);
 		ClipCursor(&clipRect);
-		center = Point2i(video_mode.width / 2, video_mode.height / 2);
-		POINT pos = { (int)center.x, (int)center.y };
+		_center = Point2i(video_mode.width / 2, video_mode.height / 2);
+		POINT pos = { (int)_center.x, (int)_center.y };
 		ClientToScreen(hWnd, &pos);
 		if (mouse_mode == MOUSE_MODE_CAPTURED)
 			SetCursorPos(pos.x, pos.y);

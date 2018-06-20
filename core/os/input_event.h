@@ -491,6 +491,7 @@ class InputEventMagnifyGesture : public InputEventGesture {
 
 	GDCLASS(InputEventMagnifyGesture, InputEventGesture)
 	real_t factor;
+	Vector2 relative;
 
 protected:
 	static void _bind_methods();
@@ -498,6 +499,9 @@ protected:
 public:
 	void set_factor(real_t p_factor);
 	real_t get_factor() const;
+
+	void set_relative(const Vector2 &p_pos);
+	Vector2 get_relative() const;
 
 	virtual Ref<InputEvent> xformed_by(const Transform2D &p_xform, const Vector2 &p_local_ofs = Vector2()) const;
 	virtual String as_text() const;
@@ -508,14 +512,14 @@ public:
 class InputEventPanGesture : public InputEventGesture {
 
 	GDCLASS(InputEventPanGesture, InputEventGesture)
-	Vector2 delta;
+	Vector2 relative;
 
 protected:
 	static void _bind_methods();
 
 public:
-	void set_delta(const Vector2 &p_delta);
-	Vector2 get_delta() const;
+	void set_relative(const Vector2 &p_pos);
+	Vector2 get_relative() const;
 
 	virtual Ref<InputEvent> xformed_by(const Transform2D &p_xform, const Vector2 &p_local_ofs = Vector2()) const;
 	virtual String as_text() const;

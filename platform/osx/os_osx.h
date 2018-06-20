@@ -119,7 +119,6 @@ public:
 	Point2 im_position;
 	ImeCallback im_callback;
 	void *im_target;
-
 	power_osx *power_manager;
 
 	CrashHandler crash_handler;

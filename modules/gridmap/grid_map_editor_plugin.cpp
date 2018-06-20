@@ -642,8 +642,8 @@ bool GridMapEditor::forward_spatial_input_event(Camera *p_camera, const Ref<Inpu
 	if (pan_gesture.is_valid()) {
 
 		if (pan_gesture->get_alt() && (pan_gesture->get_command() || pan_gesture->get_shift())) {
-			const real_t delta = pan_gesture->get_delta().y * 0.5;
-			accumulated_floor_delta += delta;
+			const real_t relative = pan_gesture->get_relative().y * 0.5;
+			accumulated_floor_delta += relative;
 			int step = 0;
 			if (ABS(accumulated_floor_delta) > 1.0) {
 				step = SGN(accumulated_floor_delta);

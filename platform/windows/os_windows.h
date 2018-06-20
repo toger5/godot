@@ -83,7 +83,9 @@ class OS_Windows : public OS {
 	bool old_invalid;
 	bool outside;
 	int old_x, old_y;
-	Point2i center;
+	Vector2 _last_pan;
+	float _last_zoom;
+	Point2i _center;
 #if defined(OPENGL_ENABLED)
 	ContextGL_Win *gl_context;
 #endif

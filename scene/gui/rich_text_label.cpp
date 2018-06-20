@@ -1003,7 +1003,7 @@ void RichTextLabel::_gui_input(Ref<InputEvent> p_event) {
 
 		if (scroll_active)
 
-			vscroll->set_value(vscroll->get_value() + vscroll->get_page() * pan_gesture->get_delta().y * 0.5 / 8);
+			vscroll->set_value(vscroll->get_value() + vscroll->get_page() * pan_gesture->get_relative().y * 0.5 / 8);
 
 		return;
 	}

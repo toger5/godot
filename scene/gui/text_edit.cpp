@@ -1935,13 +1935,13 @@ void TextEdit::_gui_input(const Ref<InputEvent> &p_gui_input) {
 	const Ref<InputEventPanGesture> pan_gesture = p_gui_input;
 	if (pan_gesture.is_valid()) {
 
-		const real_t delta = pan_gesture->get_delta().y;
+		const real_t delta = pan_gesture->get_relative().y;
 		if (delta < 0) {
 			_scroll_up(-delta);
 		} else {
 			_scroll_down(delta);
 		}
-		h_scroll->set_value(h_scroll->get_value() + pan_gesture->get_delta().x * 100);
+		h_scroll->set_value(h_scroll->get_value() + pan_gesture->get_relative().x * 100);
 		return;
 	}
 

@@ -102,6 +102,7 @@ static int mouse_x = 0;
 static int mouse_y = 0;
 static int prev_mouse_x = 0;
 static int prev_mouse_y = 0;
+static Vector2 _last_magnify_pos = Vector2(0, 0);
 static int button_mask = 0;
 static bool mouse_down_control = false;
 
@@ -671,7 +672,13 @@ static void _mouseDownEvent(NSEvent *event, int index, int mask, bool pressed) {
 	ev.instance();
 	get_key_modifier_state([event modifierFlags], ev);
 	ev->set_position(get_mouse_pos(event));
+	if (event.phase == NSEventPhaseBegan) {
+		_last_magnify_pos = get_mouse_pos(event);
+	} else {
+		ev->set_relative(get_mouse_pos(event) - _last_magnify_pos);
+	}
 	ev->set_factor([event magnification] + 1.0);
+	_last_magnify_pos = get_mouse_pos(event);
 	OS_OSX::singleton->push_input(ev);
 }
 
@@ -1055,7 +1062,7 @@ inline void sendPanEvent(double dx, double dy, int modifierFlags) {
 	get_key_modifier_state(modifierFlags, pg);
 	Vector2 mouse_pos = Vector2(mouse_x, mouse_y);
 	pg->set_position(mouse_pos);
-	pg->set_delta(Vector2(-dx, -dy));
+	pg->set_relative(Vector2(-dx, -dy));
 	OS_OSX::singleton->push_input(pg);
 }
 

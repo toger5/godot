@@ -966,11 +966,6 @@ InputEventAction::InputEventAction() {
 }
 /////////////////////////////
 
-void InputEventGesture::set_position(const Vector2 &p_pos) {
-
-	pos = p_pos;
-}
-
 void InputEventGesture::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("set_position", "position"), &InputEventGesture::set_position);
@@ -979,10 +974,15 @@ void InputEventGesture::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "position"), "set_position", "get_position");
 }
 
+void InputEventGesture::set_position(const Vector2 &p_pos) {
+
+	pos = p_pos;
+}
 Vector2 InputEventGesture::get_position() const {
 
 	return pos;
 }
+
 /////////////////////////////
 
 void InputEventMagnifyGesture::set_factor(real_t p_factor) {
@@ -993,6 +993,15 @@ void InputEventMagnifyGesture::set_factor(real_t p_factor) {
 real_t InputEventMagnifyGesture::get_factor() const {
 
 	return factor;
+}
+
+void InputEventMagnifyGesture::set_relative(const Vector2 &p_relative) {
+
+	relative = p_relative;
+}
+
+Vector2 InputEventMagnifyGesture::get_relative() const {
+	return relative;
 }
 
 Ref<InputEvent> InputEventMagnifyGesture::xformed_by(const Transform2D &p_xform, const Vector2 &p_local_ofs) const {
@@ -1019,23 +1028,18 @@ void InputEventMagnifyGesture::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_factor", "factor"), &InputEventMagnifyGesture::set_factor);
 	ClassDB::bind_method(D_METHOD("get_factor"), &InputEventMagnifyGesture::get_factor);
 
+	ClassDB::bind_method(D_METHOD("set_relative", "relative"), &InputEventMagnifyGesture::set_relative);
+	ClassDB::bind_method(D_METHOD("get_relative"), &InputEventMagnifyGesture::get_relative);
+
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "relative"), "set_relative", "get_relative");
 	ADD_PROPERTY(PropertyInfo(Variant::REAL, "factor"), "set_factor", "get_factor");
 }
 
 InputEventMagnifyGesture::InputEventMagnifyGesture() {
-
+	relative = Vector2(0, 0);
 	factor = 1.0;
 }
 /////////////////////////////
-
-void InputEventPanGesture::set_delta(const Vector2 &p_delta) {
-
-	delta = p_delta;
-}
-
-Vector2 InputEventPanGesture::get_delta() const {
-	return delta;
-}
 
 Ref<InputEvent> InputEventPanGesture::xformed_by(const Transform2D &p_xform, const Vector2 &p_local_ofs) const {
 
@@ -1046,25 +1050,32 @@ Ref<InputEvent> InputEventPanGesture::xformed_by(const Transform2D &p_xform, con
 	ev->set_modifiers_from_event(this);
 
 	ev->set_position(p_xform.xform(get_position() + p_local_ofs));
-	ev->set_delta(get_delta());
+	ev->set_relative(get_relative());
 
 	return ev;
 }
 
+void InputEventPanGesture::set_relative(const Vector2 &p_relative) {
+
+	relative = p_relative;
+}
+
+Vector2 InputEventPanGesture::get_relative() const {
+	return relative;
+}
+
 String InputEventPanGesture::as_text() const {
 
-	return "InputEventPanGesture : delta=(" + String(get_delta()) + "), position=(" + String(get_position()) + ")";
+	return "InputEventPanGesture : relative=(" + String(get_relative()) + "), position=(" + String(get_position()) + ")";
 }
 
 void InputEventPanGesture::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("set_relative", "relative"), &InputEventPanGesture::set_relative);
+	ClassDB::bind_method(D_METHOD("get_relative"), &InputEventPanGesture::get_relative);
 
-	ClassDB::bind_method(D_METHOD("set_delta", "delta"), &InputEventPanGesture::set_delta);
-	ClassDB::bind_method(D_METHOD("get_delta"), &InputEventPanGesture::get_delta);
-
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "delta"), "set_delta", "get_delta");
+	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "relative"), "set_relative", "get_relative");
 }
 
 InputEventPanGesture::InputEventPanGesture() {
-
-	delta = Vector2(0, 0);
+	relative = Vector2(0, 0);
 }
